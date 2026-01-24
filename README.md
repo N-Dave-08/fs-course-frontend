@@ -6,12 +6,6 @@ Modern frontend development with Next.js, React, and TypeScript.
 
 This course teaches you how to build modern, scalable frontend applications using Next.js 16.1.4+, React 19+, and TypeScript 5.7+. You'll learn server components, client components, routing, state management, API integration, and more.
 
-## Central Course Docs (Meta Repo)
-
-- **Version Matrix**: `https://github.com/N-Dave-08/fs-course-meta/blob/main/VERSION-MATRIX.md`
-- **Learning Flow**: `https://github.com/N-Dave-08/fs-course-meta/blob/main/LEARNING-FLOW.md`
-- **Course Index**: `https://github.com/N-Dave-08/fs-course-meta/blob/main/COURSE-INDEX.md`
-
 ## Prerequisites
 
 **IMPORTANT**: Complete [fs-course-typescript](../fs-course-typescript/) first. This course requires TypeScript knowledge.
@@ -37,14 +31,14 @@ This course consists of **6 progressive levels**:
 1. **Read the Setup Guide**: Start with [LEARNING-GUIDE.md](./LEARNING-GUIDE.md)
 2. **Follow Setup Instructions**: Install dependencies and configure your environment
 3. **Start Learning**: Begin with Level 1 and progress sequentially
-4. **Create Your App**: Follow the guide to scaffold the `project/` folder (this is where you’ll build your Next.js app)
+4. **Explore Project**: Check the `project/` folder for a complete reference implementation
 
 ## Learning Flow
 
 1. **Set Up Environment**: Follow LEARNING-GUIDE.md to scaffold Next.js project
 2. **Read Lessons**: Go through lessons sequentially
 3. **Complete Exercises**: Practice with hands-on exercises
-4. **Work in `project/`**: Create files in `project/src/` as the exercises direct
+4. **Study Project**: Explore the complete project implementation
 5. **Build Your Own**: Apply knowledge to your own projects
 
 ## File Structure
@@ -60,20 +54,17 @@ fs-course-frontend/
 ├── level-04-api-integration/
 ├── level-05-authentication/
 ├── level-06-advanced-patterns/
-├── project/ (you create this via `create-next-app`; contains your Next.js app)
+├── project/ (complete Next.js application)
 └── resources/ (cheatsheets and reference materials)
 ```
 
 ## Tech Stack
 
-- **Next.js**: latest stable (installed via `create-next-app@latest`)
-- **React**: version bundled by your installed Next.js version
-- **TypeScript**: latest stable (managed by your project toolchain)
-- **Tailwind CSS**: latest stable (installed by the scaffolder)
+- **Next.js**: 16.1.4+ (App Router, Server Components)
+- **React**: 19+ (latest)
+- **TypeScript**: 5.7+ (latest)
+- **Tailwind CSS**: 3.4+ (styling)
 - **Package Manager**: pnpm
-
-See the course-wide version matrix:
-- `https://github.com/N-Dave-08/fs-course-meta/blob/main/VERSION-MATRIX.md`
 
 ## Related Courses
 

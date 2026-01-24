@@ -2,14 +2,6 @@
 
 Complete setup instructions for the Next.js frontend development course.
 
-## Central Course Docs (Meta Repo)
-
-Replace `N-Dave-08` (already applied below):
-
-- **Version Matrix**: `https://github.com/N-Dave-08/fs-course-meta/blob/main/VERSION-MATRIX.md`
-- **Learning Flow**: `https://github.com/N-Dave-08/fs-course-meta/blob/main/LEARNING-FLOW.md`
-- **Course Index**: `https://github.com/N-Dave-08/fs-course-meta/blob/main/COURSE-INDEX.md`
-
 ## Prerequisites
 
 Before starting, ensure you have:
@@ -47,15 +39,12 @@ npx create-next-app@latest project --typescript --tailwind --app --import-alias 
 ```
 
 **What this does:**
-- Creates a new **Next.js project using the latest stable version available at install time**
-- Sets up **TypeScript** (version determined by the scaffolder/toolchain)
-- Configures **Tailwind CSS** (if selected)
-- Uses the **App Router**
+- Creates a new Next.js 16.1.4+ project
+- Sets up TypeScript 5.7+
+- Configures Tailwind CSS 3.4+
+- Uses App Router (latest)
 - Sets up import alias `@/*` for cleaner imports
 - Uses pnpm as package manager
-
-If you want the course-wide recommended versions, see:
-- `https://github.com/N-Dave-08/fs-course-meta/blob/main/VERSION-MATRIX.md`
 
 **During setup, you'll be prompted:**
 - Would you like to use ESLint? → **Yes**
@@ -84,10 +73,8 @@ npx next --version
 # Check TypeScript version
 npx tsc --version
 
-# Cross-platform: print dependency versions from package.json (Node required)
-node -p "require('./package.json').dependencies.next"
-node -p "require('./package.json').dependencies.react"
-node -p "require('./package.json').devDependencies.typescript"
+# Check React version (in package.json)
+cat package.json | grep react
 ```
 
 ### Step 5: Run Development Server
@@ -120,15 +107,6 @@ project/
 ├── next.config.js       # Next.js config
 └── tailwind.config.ts   # Tailwind config
 ```
-
-## Where to write exercise code
-
-- Your actual app lives in `project/`.
-- Unless an exercise explicitly says otherwise, create files under:
-  - `project/src/app/...`
-  - `project/src/components/...`
-  - `project/src/lib/...`
-- Keep lesson notes and scratch experiments in `project/src/` as well, so everything compiles together.
 
 ## Environment Variables
 
