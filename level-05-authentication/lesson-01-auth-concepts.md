@@ -1,4 +1,14 @@
-# Lesson 1: Authentication Concepts
+# Lesson 1: Authentication Concepts (Long-form Enhanced)
+
+> Authentication is a security boundary, not just a UI feature. This lesson goes deeper on trade-offs (cookies vs tokens), and explains why certain “easy” patterns are risky in production.
+
+## Table of Contents
+
+- Authentication vs authorization
+- Sessions/cookies vs tokens/JWT
+- Token storage trade-offs (XSS/CSRF)
+- Cross-origin considerations (CORS, SameSite)
+- Best practices, pitfalls, and troubleshooting
 
 ## Learning Objectives
 
@@ -67,6 +77,30 @@ headers: {
 
 Storing tokens in `localStorage` is simple, but **XSS can steal tokens**.
 Many production apps prefer **httpOnly cookies** for browser-based auth to reduce token theft risk.
+
+## Advanced Patterns (Preview)
+
+### 1) CSRF vs XSS: choose your trade-off intentionally
+
+- If you store auth in **httpOnly cookies**, you reduce XSS token theft risk, but may need **CSRF protections** depending on how requests are made.
+- If you store tokens in **localStorage**, you avoid cookie CSRF concerns, but XSS can steal tokens.
+
+The key takeaway:
+> There is no “free” option. Choose based on threat model and product needs.
+
+### 2) Access tokens vs refresh tokens
+
+Many systems use:
+- short-lived access token (sent frequently)
+- long-lived refresh token (used to obtain new access tokens)
+
+This reduces the impact of token theft (short expiry), but adds complexity (rotation, revocation).
+
+### 3) Logout semantics
+
+“Logout” means different things depending on your system:
+- cookie/session: invalidate server session and clear cookie
+- stateless JWT: often “clear token on client”, unless you maintain a denylist or use refresh-token storage
 
 ## Token Storage Options (Trade-offs)
 

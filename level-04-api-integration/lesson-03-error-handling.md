@@ -1,4 +1,14 @@
-# Lesson 3: Error Handling
+# Lesson 3: Error Handling (Long-form Enhanced)
+
+> Error handling is part of your UI contract. This lesson focuses on building predictable failure UX: route boundaries, useful messages, safe details, and retry paths.
+
+## Table of Contents
+
+- Where errors happen (server vs client)
+- Local try/catch vs route error boundaries
+- Loading + retry/reset flows
+- Expected vs unexpected errors
+- Advanced patterns (preview): error codes, logging/reporting, not-found
 
 ## Learning Objectives
 
@@ -117,6 +127,26 @@ Place `loading.tsx` in the route segment that needs it:
 - 404 not found
 
 ### Unexpected errors
+
+## Advanced Patterns (Preview)
+
+### 1) Error codes over English strings
+
+If your backend provides stable machine-readable error codes (e.g. `VALIDATION_FAILED`), your frontend can:
+- show better UI messages
+- render field-level validation
+- avoid brittle string parsing
+
+### 2) Not-found UI (`not-found.tsx`)
+
+For “resource does not exist” cases, a dedicated not-found UI is often better UX than a generic error message.
+
+### 3) Logging / reporting (production)
+
+In production apps, you usually:
+- log errors server-side (API)
+- capture client errors (Sentry or similar)
+- correlate issues with request ids
 
 - 500 server bugs
 - code bugs in your app

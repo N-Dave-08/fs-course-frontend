@@ -1,4 +1,14 @@
-# Lesson 1: API Client Setup
+# Lesson 1: API Client Setup (Long-form Enhanced)
+
+> A frontend that “talks to a backend” lives or dies by consistency: base URLs, headers, auth, and error shapes. This lesson is long-form so your API layer stays predictable as your app grows.
+
+## Table of Contents
+
+- Why an API client wrapper matters
+- Base URL strategies (browser vs server)
+- Typed `fetch` wrapper (happy path + error path)
+- Error shape design (predictable UI handling)
+- Advanced patterns (preview): auth headers/cookies, 204 handling, request ids
 
 ## Learning Objectives
 
@@ -87,6 +97,28 @@ export async function apiClient<T>(
   return response.json();
 }
 ```
+
+## Advanced Patterns (Preview)
+
+### 1) Handling `204 No Content`
+
+Some APIs return `204` with an empty body. If you always call `response.json()`, you may get a parsing error.
+Two common solutions:
+- special-case 204 in the client
+- ensure the backend returns JSON consistently (even for deletes)
+
+### 2) Auth: cookies vs Authorization header (concept)
+
+Depending on your auth approach, your client may need to:
+- include cookies (`credentials: "include"`)
+- attach `Authorization: Bearer <token>` headers
+
+Keep this logic centralized in the API client so you don’t re-implement auth in every request.
+
+### 3) Request ids (debugging in production)
+
+Many production APIs include an `x-request-id` header in responses.
+Capturing it in error details (and surfacing it in UI logs) can make support/debugging dramatically faster.
 
 ### Why we parse the error body
 

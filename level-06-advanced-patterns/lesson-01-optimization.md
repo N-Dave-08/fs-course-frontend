@@ -1,4 +1,14 @@
-# Lesson 1: Optimization
+# Lesson 1: Optimization (Long-form Enhanced)
+
+> Optimization is easiest when it’s principled: measure → identify bottleneck → apply the smallest change that improves real user experience. This lesson is long-form so you have a practical checklist when performance becomes a product problem.
+
+## Table of Contents
+
+- What to optimize (load vs runtime vs bundle)
+- Next.js primitives (Image, code splitting, server components)
+- React memoization (when it helps vs hurts)
+- Real-world optimization workflow
+- Pitfalls and troubleshooting
 
 ## Learning Objectives
 
@@ -91,6 +101,24 @@ export const ExpensiveComponent = memo(function ExpensiveComponent({
 - `useCallback` caches function references passed to child components
 
 Use them when you’ve identified a real re-render problem.
+
+## Advanced Notes (Preview)
+
+### 1) Measure with real constraints
+
+Dev machines are fast. A “fast on my laptop” UI can be slow on mid-range phones.
+Prefer:
+- mobile throttling in DevTools
+- Lighthouse/Web Vitals
+- real device checks for critical flows
+
+### 2) Avoid “optimize the wrong thing”
+
+If the backend is slow or the data is huge, frontend memoization won’t fix the problem.
+Start by identifying whether the bottleneck is:
+- network (slow API)
+- rendering (too much DOM/work)
+- bundle size (too much JS)
 
 ## Real-World Scenario: Optimizing a Dashboard
 

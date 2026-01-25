@@ -1,4 +1,14 @@
-# Lesson 3: Session Management
+# Lesson 3: Session Management (Long-form Enhanced)
+
+> “Auth” isn’t complete when login works once. Session management is about keeping UI, storage, and API calls consistent over time: refreshes, navigation, token expiry, and logout.
+
+## Table of Contents
+
+- What a session is (vs token)
+- Login/logout flows and predictable UI state
+- Sharing auth state with context (`AuthProvider` / `useAuth`)
+- Common pitfalls (SSR boundaries, stale state, double sources of truth)
+- Advanced patterns (preview): refresh, cookie sessions, “me” endpoint
 
 ## Learning Objectives
 
@@ -61,6 +71,35 @@ function logout(router: { push: (path: string) => void }) {
 ```
 
 In a cookie-based session system, logout usually calls a backend endpoint to clear the cookie/session server-side.
+
+## Advanced Patterns (Preview)
+
+### 1) The “me” endpoint (authoritative user state)
+
+Instead of trusting client storage, many apps:
+- store auth credential (cookie/token)
+- call `GET /api/me` to get the current user
+- treat that response as the source of truth for UI
+
+This prevents “token exists but user is invalid” edge cases.
+
+### 2) Token expiry and refresh
+
+If tokens expire:
+- detect 401 responses
+- redirect to login or refresh token (depending on architecture)
+
+Avoid infinite retry loops. Always cap retries.
+
+### 3) Avoid double sources of truth
+
+A common bug:
+- `localStorage` says “logged in”
+- React state says “logged out”
+
+Pick one:
+- either derive state from `localStorage` on mount (simple)
+- or use cookies + server-driven auth state (more robust)
 
 ## Sharing Auth State with Context
 

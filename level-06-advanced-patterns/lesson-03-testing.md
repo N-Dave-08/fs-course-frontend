@@ -1,4 +1,14 @@
-# Lesson 3: Testing
+# Lesson 3: Testing (Long-form Enhanced)
+
+> Testing is how you keep velocity without fear. This lesson is long-form because test choices are architectural: what you test shapes how you design components, routes, and APIs.
+
+## Table of Contents
+
+- Test types (unit vs integration vs E2E)
+- React Testing Library basics (user-visible behavior)
+- Playwright basics (critical flows)
+- What to test vs what not to test
+- Avoiding flaky tests (stability patterns)
 
 ## Learning Objectives
 
@@ -108,6 +118,31 @@ Common causes of flakiness:
 
 Prefer robust selectors:
 - `getByRole`, `getByLabel`, `getByText` (with care)
+
+## Advanced Patterns (Preview)
+
+### 1) Test “contracts”, not implementation details
+
+Great tests assert:
+- what the user sees
+- what the user can do
+- what the system guarantees (error messages, redirects)
+
+Avoid brittle assertions like:
+- exact Tailwind class lists
+- internal state values
+
+### 2) Make E2E reliable by controlling dependencies
+
+E2E tests become flaky when they depend on:
+- random seed data
+- external services
+- timing-based waits
+
+Use:
+- stable test data
+- deterministic environments
+- condition-based waits (Playwright auto-waits)
 
 ## Real-World Scenario: “Test Pyramid” for a Full-Stack App
 

@@ -1,4 +1,15 @@
-# Lesson 2: Layouts
+# Lesson 2: Layouts (Long-form Enhanced)
+
+> Layout is where “looks fine on my screen” becomes a real, maintainable UI system. This lesson goes beyond flex/grid snippets and focuses on repeatable patterns: page shells, readable content widths, and avoiding common overflow/layout shift issues.
+
+## Table of Contents
+
+- Flexbox patterns (1D layouts)
+- Grid patterns (2D layouts)
+- Containers, max-width, and readable typography
+- Next.js `layout.tsx` (root + nested)
+- Advanced layout concerns (sticky headers, overflow, min-height)
+- Pitfalls and troubleshooting
 
 ## Learning Objectives
 
@@ -122,6 +133,37 @@ flowchart TD
   root[app/layout.tsx] --> dashboard[app/dashboard/layout.tsx]
   dashboard --> page[app/dashboard/page.tsx]
 ```
+
+## Advanced Layout Concerns (Real-world)
+
+### 1) Sticky headers and scroll containers
+
+Sticky UI often breaks when the wrong element scrolls. If you put `overflow-auto` on a parent container, `position: sticky` may not behave like you expect.
+
+Rule of thumb:
+- keep the main page scroll on the document when possible
+- use internal scroll containers only when you truly need them (tables, side panels)
+
+### 2) `min-h-screen` for page shells
+
+A classic pattern for “footer at the bottom” layouts:
+
+```typescript
+<div className="min-h-screen flex flex-col">
+  <header className="border-b">Header</header>
+  <main className="flex-1">Content</main>
+  <footer className="border-t">Footer</footer>
+</div>
+```
+
+### 3) Avoiding layout shift (CLS)
+
+Common causes:
+- images without reserved space
+- fonts loading late
+- content inserted above the fold after hydration
+
+Use Next.js `Image` (dimensions) and stable spacing primitives to reduce CLS.
 
 ## Real-World Scenario: Common App Shell
 

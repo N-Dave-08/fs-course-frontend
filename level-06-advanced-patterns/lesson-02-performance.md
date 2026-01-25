@@ -1,4 +1,15 @@
-# Lesson 2: Performance
+# Lesson 2: Performance (Long-form Enhanced)
+
+> Performance is the “systems thinking” side of frontend: server/client boundaries, streaming, caching, and avoiding waterfalls. This long-form lesson focuses on practical levers you’ll actually use in a Next.js app.
+
+## Table of Contents
+
+- Main performance levers in App Router
+- Server components and bundle size
+- Streaming + Suspense
+- Caching/revalidation trade-offs
+- Avoiding waterfalls
+- Pitfalls and troubleshooting
 
 ## Learning Objectives
 
@@ -89,6 +100,24 @@ const data = await fetch(url, {
 
 - lower revalidate = fresher data, more load
 - higher revalidate = faster responses, potentially stale data
+
+## Advanced Patterns (Preview)
+
+### 1) `cache: "no-store"` for always-fresh pages
+
+For authenticated dashboards, you often want fresh data:
+
+```typescript
+await fetch(url, { cache: "no-store" });
+```
+
+### 2) Parallelize independent work
+
+If you need multiple data sources, start them together and `await` later (you already saw this with `Promise.all`).
+
+### 3) Watch for accidental client bloat
+
+Adding `"use client"` to a large shared layout can ship a lot of JS and slow your app even if the UI looks “simple”.
 
 ## Avoiding Waterfalls
 

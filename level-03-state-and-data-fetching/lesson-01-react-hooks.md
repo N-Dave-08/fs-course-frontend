@@ -1,4 +1,16 @@
-# Lesson 1: React Hooks
+# Lesson 1: React Hooks (Long-form Enhanced)
+
+> Hooks are a core React skill, but in Next.js App Router they also intersect with architecture: hooks usually mean **Client Components**. This lesson goes deeper on the “why” behind common rules so you can debug hook bugs confidently.
+
+## Table of Contents
+
+- Why hooks exist (mental model)
+- `useState` and re-renders
+- `useEffect` and dependency arrays
+- Common pitfalls (stale closures, infinite loops, derived state)
+- Custom hooks and reuse
+- Advanced hooks (preview): `useMemo`, `useCallback`, `useReducer`
+- Troubleshooting checklist
 
 ## Learning Objectives
 
@@ -9,7 +21,7 @@ By the end of this lesson, you will be able to:
 - Avoid common hook pitfalls (stale closures, infinite effects, derived state)
 - Create custom hooks to reuse stateful logic across components
 
-## Why Using Hooks Correctly Matters
+## Why Hooks Matter
 
 Hooks are how modern React manages:
 - state (data that changes over time)
@@ -112,6 +124,65 @@ If a value can be computed from props/state, don’t store it as separate state.
 ### 3) Stale closures
 
 Effects “capture” values from the render that created them. Use dependencies or functional updates.
+
+## Advanced Hooks (Preview)
+
+You don’t need these on day one, but you’ll see them in production code.
+
+### `useMemo` (performance + stability)
+
+Use `useMemo` to avoid recomputing expensive values every render (and to keep stable references):
+
+```typescript
+"use client";
+
+import { useMemo } from "react";
+
+function expensiveCompute(items: number[]) {
+  return items.reduce((sum, n) => sum + n, 0);
+}
+
+export function Total({ items }: { items: number[] }) {
+  const total = useMemo(() => expensiveCompute(items), [items]);
+  return <div>Total: {total}</div>;
+}
+```
+
+### `useCallback` (stable function references)
+
+`useCallback` is useful when you pass callbacks deep into child components and want stable references:
+
+```typescript
+import { useCallback, useState } from "react";
+
+export function Parent() {
+  const [count, setCount] = useState(0);
+  const onClick = useCallback(() => setCount((c) => c + 1), []);
+  return <button onClick={onClick}>Count: {count}</button>;
+}
+```
+
+### `useReducer` (complex state transitions)
+
+When state changes are complex or need to be very explicit, `useReducer` can be clearer than many `useState` calls.
+
+## Troubleshooting
+
+### Issue: “Effect runs in a loop”
+
+**Common causes:**
+- you update a dependency inside the effect
+- you create a new object/array each render and put it in the dependency list
+
+**Fixes:**
+1. Move derived objects outside render or wrap them in `useMemo`.
+2. Ensure you’re not setting state in a way that triggers the same effect repeatedly.
+
+### Issue: “State updates don’t show up” / stale values
+
+**Fixes:**
+1. Use functional updates when the next state depends on the previous state.
+2. Add the correct dependencies to `useEffect` (don’t “lie” to React to silence lint warnings).
 
 ## Custom Hooks
 

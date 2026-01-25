@@ -1,4 +1,15 @@
-# Lesson 1: Tailwind CSS
+# Lesson 1: Tailwind CSS (Long-form Enhanced)
+
+> Tailwind is more than “utility classes”. Used well, it becomes a design system enforcement tool: shared spacing, consistent typography, predictable layouts, and fewer one-off CSS hacks.
+
+## Table of Contents
+
+- Utility-first CSS and why Tailwind works
+- Core utilities you’ll use daily
+- Component patterns (states, variants, composition)
+- Design system customization (`tailwind.config.ts`)
+- When to use custom CSS
+- Pitfalls, troubleshooting, and advanced patterns
 
 ## Learning Objectives
 
@@ -92,6 +103,33 @@ export function Button({ label, disabled, onClick }: ButtonProps) {
 
 This demonstrates a key Tailwind idea: states are expressed as variants (`hover:`, `focus:`, `disabled:`).
 
+## Composition Pattern: Extracting “variants” cleanly
+
+As your app grows, you’ll want to avoid repeating long `className` strings everywhere.
+
+A common pattern is:
+- keep a small set of reusable components (`Button`, `Card`, `Input`)
+- centralize variant rules (size, intent, disabled) in one place
+
+Even without extra libraries, you can start with small helpers:
+
+```typescript
+function cx(...parts: Array<string | false | null | undefined>) {
+  return parts.filter(Boolean).join(" ");
+}
+```
+
+Then:
+
+```typescript
+const buttonClass = (intent: "primary" | "secondary") =>
+  cx(
+    "rounded px-4 py-2 font-medium transition",
+    intent === "primary" && "bg-blue-600 text-white hover:bg-blue-700",
+    intent === "secondary" && "bg-slate-100 text-slate-900 hover:bg-slate-200"
+  );
+```
+
 ## Customization (Design System)
 
 Configure Tailwind in `tailwind.config.ts` to add brand colors, spacing, fonts, etc.
@@ -112,26 +150,30 @@ export default {
 
 If you define `primary`, you reduce arbitrary one-off colors and keep the UI consistent.
 
-## Real-World Scenario: Keeping UI Consistent on a Team
-
-Your team is building a dashboard with lots of small UI pieces (buttons, cards, forms).
-
-Without shared styling rules, you end up with:
-- slightly different padding everywhere (`px-3` vs `px-4`)
-- inconsistent colors (`bg-blue-600` vs `bg-sky-600`)
-- missing focus states (bad accessibility)
-
-Tailwind helps when you:
-- agree on a shared scale (spacing/typography/colors)
-- extract repeated class patterns into components (`Button`, `Card`)
-- use consistent interaction states (`hover:`, `focus:`, `disabled:`)
-
 ## When to Use Custom CSS
 
 Tailwind is great for most UI, but custom CSS can still be appropriate for:
 - complex animations
 - rare, highly custom layouts
 - third-party components requiring overrides
+
+## Advanced Patterns (Preview)
+
+### 1) Dark mode (concept)
+
+Many apps support dark mode. Tailwind supports this with variants like `dark:*` (configuration-dependent).
+Even if you don’t implement it now, build components so colors are not hard-coded everywhere.
+
+### 2) Accessibility-first styling
+
+Common, high-value defaults:
+- visible focus styles (`focus:ring-*`)
+- sufficient color contrast
+- avoid using color alone to convey meaning (also use icons/text)
+
+### 3) Avoid “CSS fights” by leaning on the scale
+
+If you frequently reach for arbitrary values like `mt-[13px]`, it’s a sign your scale (spacing/typography) should be adjusted in config or your component composition needs a refactor.
 
 In Next.js, you can use global styles (`globals.css`) and/or CSS modules for scoped styles.
 

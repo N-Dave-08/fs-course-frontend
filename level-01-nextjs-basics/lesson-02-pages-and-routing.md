@@ -1,4 +1,15 @@
-# Lesson 2: Pages and Routing
+# Lesson 2: Pages and Routing (Long-form Enhanced)
+
+> This lesson is long-form because routing is the “skeleton” of your app. If routing structure is wrong early, everything else becomes harder: layouts, data fetching boundaries, auth gating, and even performance.
+
+## Table of Contents
+
+- File-based routing rules (App Router)
+- Static routes and nested layouts
+- Dynamic routes (`[param]`) and common patterns
+- Navigation (`next/link`) and UX
+- Advanced routing concepts (route groups, loading/error, not-found)
+- Pitfalls and troubleshooting
 
 ## Learning Objectives
 
@@ -8,14 +19,6 @@ By the end of this lesson, you will be able to:
 - Build dynamic routes using `[param]` segments and read `params`
 - Navigate between routes using `next/link`
 - Recognize common routing pitfalls (wrong file placement, missing `page.tsx`, layout misunderstandings)
-
-## Prerequisites
-
-Before you start, make sure you have:
-
-1. A Next.js App Router project created (follow `fs-course-frontend/LEARNING-GUIDE.md`)
-2. A working `project/` folder (recommended: `fs-course-frontend/project/`)
-3. The dev server running (`pnpm dev`) at least once successfully
 
 ## Why Routing Matters
 
@@ -32,108 +35,6 @@ flowchart TD
   segment --> page[page.tsx]
   segment --> layout[layout.tsx]
 ```
-
-## Basic Implementation
-
-In this deep dive, you’ll implement:
-
-- **two static routes**: `/` and `/about`
-- **one dynamic route**: `/blog/[slug]`
-- **a nested layout** that wraps only the blog section
-- **navigation** that uses `next/link`
-
-### Step 1: Ensure you have a root layout + nav
-
-Create or update `project/app/layout.tsx`:
-
-```typescript
-// project/app/layout.tsx
-import type { ReactNode } from "react";
-import Link from "next/link";
-
-export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <html lang="en">
-      <body style={{ fontFamily: "system-ui, sans-serif" }}>
-        <header style={{ padding: 24, borderBottom: "1px solid #ddd" }}>
-          <nav style={{ display: "flex", gap: 12 }}>
-            <Link href="/">Home</Link>
-            <Link href="/about">About</Link>
-            <Link href="/blog/hello-world">Blog example</Link>
-          </nav>
-        </header>
-        {children}
-      </body>
-    </html>
-  );
-}
-```
-
-### Step 2: Create a static route (`/about`)
-
-Create `project/app/about/page.tsx`:
-
-```typescript
-// project/app/about/page.tsx
-export default function AboutPage() {
-  return (
-    <main style={{ padding: 24 }}>
-      <h1>About</h1>
-      <p>This is a static route because it’s `app/about/page.tsx`.</p>
-    </main>
-  );
-}
-```
-
-### Step 3: Create a dynamic route (`/blog/[slug]`)
-
-Create `project/app/blog/[slug]/page.tsx`:
-
-```typescript
-// project/app/blog/[slug]/page.tsx
-export default async function BlogPostPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-
-  return (
-    <main style={{ padding: 24 }}>
-      <h1>Blog Post</h1>
-      <p>Slug: {slug}</p>
-    </main>
-  );
-}
-```
-
-Why a dynamic route matters:
-- one “route template” can serve many URLs
-- the URL becomes part of your component input (`params`)
-
-### Step 4: Add a nested blog layout
-
-Create `project/app/blog/layout.tsx`:
-
-```typescript
-// project/app/blog/layout.tsx
-import type { ReactNode } from "react";
-
-export default function BlogLayout({ children }: { children: ReactNode }) {
-  return (
-    <section style={{ padding: 24 }}>
-      <aside style={{ marginBottom: 16, color: "#555" }}>
-        <strong>Blog layout:</strong> this wrapper only applies to /blog/*
-      </aside>
-      {children}
-    </section>
-  );
-}
-```
-
-This is the key mental model:
-- `app/layout.tsx` wraps everything
-- `app/blog/layout.tsx` wraps only the blog segment and its children
 
 ## File-Based Routing (App Router)
 
@@ -238,6 +139,37 @@ export default function RootLayout({
 
 You can add `app/blog/layout.tsx` to create blog-specific wrappers without affecting other routes.
 
+## Advanced Routing Concepts (Preview)
+
+These are not required on day one, but you’ll see them in real apps:
+
+### Route groups
+
+Route groups let you organize folders without affecting the URL. They use parentheses:
+- `app/(marketing)/...`
+- `app/(app)/dashboard/...`
+
+This helps you keep “public site” and “app” concerns separate while maintaining a clean URL structure.
+
+### Loading UI
+
+You can add `loading.tsx` to a segment to show immediate UI while server work happens:
+
+```typescript
+// app/dashboard/loading.tsx
+export default function Loading() {
+  return <p>Loading dashboard...</p>;
+}
+```
+
+### Not Found and error boundaries (Next.js conventions)
+
+Common files:
+- `not-found.tsx` to render a 404 UI for a segment
+- `error.tsx` to render an error UI for a segment
+
+These are core building blocks for robust UX and consistent failure handling.
+
 ## Real-World Scenario: Dashboard + Public Site
 
 Typical apps have:
@@ -245,28 +177,6 @@ Typical apps have:
 - app routes: `/dashboard`, `/settings`
 
 With App Router, you can create layout boundaries (e.g., dashboard sidebar) as nested layouts.
-
-## Complete Example: Static + Dynamic + Nested Layout
-
-After completing the steps above, your `project/` should include:
-
-```text
-project/
-└── app/
-    ├── layout.tsx
-    ├── page.tsx
-    ├── about/
-    │   └── page.tsx
-    └── blog/
-        ├── layout.tsx
-        └── [slug]/
-            └── page.tsx
-```
-
-Try visiting:
-- `http://localhost:3000/about`
-- `http://localhost:3000/blog/hello-world`
-- `http://localhost:3000/blog/another-post`
 
 ## Best Practices
 
@@ -282,6 +192,13 @@ Use clear folder names and avoid over-nesting early.
 
 It keeps routing fast and consistent.
 
+### 4) Use layout boundaries intentionally
+
+Layouts aren’t just “wrappers”—they’re architectural boundaries:
+- where shared navigation lives
+- where providers live
+- where auth gating might live (sometimes)
+
 ## Common Pitfalls and Solutions
 
 ### Pitfall 1: Creating a folder but forgetting `page.tsx`
@@ -295,6 +212,15 @@ It keeps routing fast and consistent.
 **Problem:** Putting page content in `layout.tsx` and expecting it to be a route.
 
 **Solution:** Layouts wrap; pages render as the route entry.
+
+### Pitfall 3: Over-nesting route segments too early
+
+**Problem:** You create deeply nested folders for everything and routing becomes hard to reason about.
+
+**Solution:** Start simple:
+- `app/(marketing)`
+- `app/(app)`
+Then add deeper nesting only when the product demands it.
 
 ## Troubleshooting
 
@@ -317,23 +243,16 @@ It keeps routing fast and consistent.
 1. Use `next/link` for internal navigation.
 2. Avoid `<a href="/...">` for internal routes unless you intentionally want a reload.
 
-## Testing Your Implementation
+### Issue: Layout changes unexpectedly across routes
 
-### Manual test checklist
+**Symptoms:**
+- a sidebar/header appears where you didn’t expect
+- a layout affects unrelated routes
 
-1. Run `pnpm dev`.
-2. Visit `/about` and confirm it renders.
-3. Visit `/blog/hello-world` and confirm you see the slug.
-4. Confirm the blog page shows the “Blog layout” wrapper (nested layout works).
-5. Click the nav links and confirm routing is fast (no full reload).
-
-### Build-time check
-
-```bash
-pnpm build
-```
-
-If you hit TypeScript errors around `params`, ensure your page function signature matches your Next.js version expectations and keep it consistent across your project.
+**Solutions:**
+1. Confirm which segment the `layout.tsx` is in.
+2. Remember: layouts apply to that folder and all nested routes.
+3. Use route groups to separate “marketing” vs “app” layout concerns.
 
 ## Next Steps
 
@@ -348,6 +267,7 @@ Now that you understand pages and routing:
 
 - [Next.js Docs: Routing](https://nextjs.org/docs/app/building-your-application/routing)
 - [Next.js Docs: Layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts)
+- [Next.js Docs: Loading UI](https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming)
 
 ---
 

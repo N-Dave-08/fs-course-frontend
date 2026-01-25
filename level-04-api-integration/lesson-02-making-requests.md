@@ -1,4 +1,13 @@
-# Lesson 2: Making Requests
+# Lesson 2: Making Requests (Long-form Enhanced)
+
+> Requests are easy to write once and hard to maintain at scale. This lesson focuses on repeatable patterns: typed inputs/outputs, predictable loading/error states, and avoiding common UI bugs like double-submits and inconsistent optimistic updates.
+
+## Table of Contents
+
+- CRUD requests (GET/POST/PUT/DELETE)
+- Server component vs client component patterns
+- Loading/error UX patterns
+- Advanced patterns (preview): optimistic UI, retries, and request cancellation
 
 ## Learning Objectives
 
@@ -88,6 +97,27 @@ await apiClient<void>("/api/users/123", {
 ```
 
 Some APIs return `204 No Content`. In that case, you may choose to special-case parsing in `apiClient` later (advanced).
+
+## Advanced Patterns (Preview)
+
+### 1) Prevent double-submit on mutations
+
+If a user can click “Save” twice quickly, you can accidentally create duplicate records.
+
+Baseline approach:
+- set a `saving` state
+- disable the button while the request is in flight
+
+### 2) Optimistic UI (careful)
+
+Optimistic updates make the UI feel instant, but introduce rollback complexity if the request fails.
+Rule of thumb:
+- use optimistic UI for low-risk actions
+- always have a rollback path when failure matters
+
+### 3) Cancellation (avoid setting state after unmount)
+
+You already used the “cancelled flag” pattern. Another option is `AbortController` (more advanced) to cancel fetch requests when a component unmounts or when inputs change.
 
 ## Client Component Pattern: Loading + Error + Data
 

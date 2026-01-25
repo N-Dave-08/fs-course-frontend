@@ -1,4 +1,14 @@
-# Lesson 2: Data Fetching
+# Lesson 2: Data Fetching (Long-form Enhanced)
+
+> Data fetching is where performance, security, and UX meet. This long-form lesson focuses on making fetching intentional: server-first by default, explicit caching intent, and predictable error handling.
+
+## Table of Contents
+
+- Server fetching in App Router (default)
+- Client fetching (when needed)
+- Loading UI + streaming mental model
+- Caching intent (preview) and common pitfalls
+- Troubleshooting checklist
 
 ## Learning Objectives
 
@@ -61,6 +71,22 @@ export default async function PostsPage() {
 - you avoid exposing API keys to the browser
 - you can keep request logic close to the route that needs it
 
+## Caching Intent (Preview)
+
+In App Router, you should be explicit about your caching intent. A very rough mental model:
+- “Is this safe to cache?”
+- “How fresh does it need to be?”
+
+You’ll see patterns like:
+- `cache: "no-store"` for always-fresh data (often authenticated)
+- revalidation strategies for mostly-static content
+
+Example (conceptual):
+
+```typescript
+await fetch("https://api.example.com/posts", { cache: "no-store" });
+```
+
 ## Client-Side Fetching (When Needed)
 
 Use client-side fetching when:
@@ -118,6 +144,53 @@ export default function Loading() {
 ### Mental model
 
 - Next.js can start rendering UI and stream pieces as data resolves
+
+## Common Pitfalls and Solutions
+
+### Pitfall 1: Waterfall fetching
+
+**Problem:** You fetch sequentially when requests could be parallel, slowing the page.
+
+**Solution:** Start independent fetches together and `await` them later:
+
+```typescript
+const postsPromise = fetch("/api/posts");
+const userPromise = fetch("/api/me");
+const [postsRes, userRes] = await Promise.all([postsPromise, userPromise]);
+```
+
+### Pitfall 2: Double fetching (server + client)
+
+**Problem:** You fetch the same data in a server component and then again in a client component on mount.
+
+**Solution:** Decide where the “source of truth” is:
+- server fetch for initial render
+- client fetch only for interactive refreshes
+
+### Pitfall 3: Silent failures
+
+**Problem:** You ignore `res.ok` and render empty UI when the request failed.
+
+**Solution:** Always check `res.ok` and surface a useful error message (and log server-side when appropriate).
+
+## Troubleshooting
+
+### Issue: “Fetch works in the browser but fails on the server”
+
+**Common causes:**
+- missing environment variables (server-only secrets)
+- calling a URL that is only reachable from the browser
+- CORS misunderstandings when calling external APIs
+
+**Fixes:**
+1. Confirm the URL is reachable from the server environment.
+2. Keep secrets server-side and pass only safe data to clients.
+
+### Issue: You see “loading spinners” everywhere
+
+**Fixes:**
+1. Default to server fetching for the initial page HTML when possible.
+2. Use client fetching only for interactive updates.
 - `loading.tsx` displays while the segment is waiting
 
 ## Avoiding Waterfalls
