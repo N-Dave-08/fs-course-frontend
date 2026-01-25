@@ -9,6 +9,14 @@ By the end of this lesson, you will be able to:
 - Know when to use server vs client components
 - Run a Next.js dev server and locate the entry route (`app/page.tsx`)
 
+## Prerequisites
+
+Before you start, make sure you have:
+
+1. A Next.js App Router project created (follow `fs-course-frontend/LEARNING-GUIDE.md`)
+2. A `project/` folder for this course (recommended: `fs-course-frontend/project/`)
+3. Node.js + pnpm installed and working
+
 ## Why Next.js Matters
 
 React is a UI library. Next.js is a framework that adds the “application” parts:
@@ -26,6 +34,91 @@ flowchart TD
   next --> client[ClientRendering]
   next --> router[FileBasedRouting]
 ```
+
+## Basic Implementation
+
+In this deep dive, you’ll do the minimum steps that make Next.js “feel real”:
+
+- run the dev server
+- create a home page (`/`)
+- add a second route (`/about`)
+- add a root layout that wraps both routes
+
+### Step 1: Run the dev server
+
+From your `project/` folder:
+
+```bash
+pnpm dev
+```
+
+Then open `http://localhost:3000`.
+
+### Step 2: Create the home route
+
+Create or update `project/app/page.tsx`:
+
+```typescript
+// project/app/page.tsx
+export default function Home() {
+  return (
+    <main style={{ padding: 24 }}>
+      <h1>Welcome to Next.js</h1>
+      <p>This is the home page.</p>
+    </main>
+  );
+}
+```
+
+### Step 3: Add a second route (`/about`)
+
+Create `project/app/about/page.tsx`:
+
+```typescript
+// project/app/about/page.tsx
+import Link from "next/link";
+
+export default function AboutPage() {
+  return (
+    <main style={{ padding: 24 }}>
+      <h1>About</h1>
+      <p>This route exists because you created `app/about/page.tsx`.</p>
+      <Link href="/">Back home</Link>
+    </main>
+  );
+}
+```
+
+### Step 4: Add a root layout that wraps all pages
+
+Create or update `project/app/layout.tsx`:
+
+```typescript
+// project/app/layout.tsx
+import type { ReactNode } from "react";
+import Link from "next/link";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body style={{ fontFamily: "system-ui, sans-serif" }}>
+        <header style={{ padding: 24, borderBottom: "1px solid #ddd" }}>
+          <nav style={{ display: "flex", gap: 12 }}>
+            <Link href="/">Home</Link>
+            <Link href="/about">About</Link>
+          </nav>
+        </header>
+
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+Why this matters:
+- layouts help you avoid repeating UI (nav, footers) in every page
+- file-based routing keeps your app structure predictable
 
 ## What is Next.js?
 
@@ -98,6 +191,23 @@ Then open `http://localhost:3000`.
 - **Server Components**: default; run on server, ship less JS
 - **Client Components**: opt-in with `"use client"` for interactivity
 
+## Complete Example: A Two-Route App with a Shared Layout
+
+After finishing the basic implementation steps, your `project/` should include:
+
+```text
+project/
+└── app/
+    ├── layout.tsx
+    ├── page.tsx
+    └── about/
+        └── page.tsx
+```
+
+You can now navigate between:
+- `/` (home)
+- `/about` (about)
+
 ## Real-World Scenario: Why This Matters for a Full-Stack App
 
 In a typical product:
@@ -145,6 +255,23 @@ Next.js already optimizes a lot—use the framework primitives before reaching f
 1. Check the error overlay message and file path.
 2. Confirm the route file exists: `app/page.tsx`.
 3. Restart the dev server if you changed config files.
+
+## Testing Your Implementation
+
+### Manual test checklist
+
+1. Run `pnpm dev`.
+2. Visit `http://localhost:3000` and confirm you see “Welcome to Next.js”.
+3. Click “About” in the nav (or visit `/about`) and confirm it renders.
+4. Click “Home” and confirm navigation does not full-refresh.
+
+### Build-time check
+
+Run a production build to catch common routing/layout mistakes early:
+
+```bash
+pnpm build
+```
 
 ## Next Steps
 

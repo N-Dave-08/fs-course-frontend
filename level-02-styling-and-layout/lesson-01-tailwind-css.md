@@ -112,6 +112,20 @@ export default {
 
 If you define `primary`, you reduce arbitrary one-off colors and keep the UI consistent.
 
+## Real-World Scenario: Keeping UI Consistent on a Team
+
+Your team is building a dashboard with lots of small UI pieces (buttons, cards, forms).
+
+Without shared styling rules, you end up with:
+- slightly different padding everywhere (`px-3` vs `px-4`)
+- inconsistent colors (`bg-blue-600` vs `bg-sky-600`)
+- missing focus states (bad accessibility)
+
+Tailwind helps when you:
+- agree on a shared scale (spacing/typography/colors)
+- extract repeated class patterns into components (`Button`, `Card`)
+- use consistent interaction states (`hover:`, `focus:`, `disabled:`)
+
 ## When to Use Custom CSS
 
 Tailwind is great for most UI, but custom CSS can still be appropriate for:

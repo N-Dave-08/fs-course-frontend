@@ -9,7 +9,15 @@ By the end of this lesson, you will be able to:
 - Type component props cleanly with TypeScript
 - Organize components in a maintainable folder structure
 
-## Why Components Matter
+## Prerequisites
+
+Before you start, make sure you have:
+
+1. A Next.js App Router project created (follow `fs-course-frontend/LEARNING-GUIDE.md`)
+2. A working `project/` folder (recommended: `fs-course-frontend/project/`)
+3. A basic home page already rendering at `/` (from Lesson 1)
+
+## Why Component Design Matters
 
 Components are how you build UI with React/Next.js:
 - reuse UI and logic
@@ -25,6 +33,95 @@ flowchart TD
   server --> data[ServerDataAccess]
   client --> interactivity[EventsStateEffects]
 ```
+
+## Basic Implementation
+
+In this deep dive, you’ll build a small “server shell + client widget” page, which is one of the most common App Router patterns:
+
+- a **server component** loads data (or prepares data)
+- a **client component** handles interactivity (`useState`, events)
+- the page composes them together safely (serializable props only)
+
+### Step 1: Create a server component that prepares data
+
+Create `project/components/server/FeaturedProduct.tsx`:
+
+```typescript
+// project/components/server/FeaturedProduct.tsx
+export type FeaturedProduct = {
+  id: string;
+  name: string;
+  priceCents: number;
+};
+
+async function getFeaturedProduct(): Promise<FeaturedProduct> {
+  // Simulate server-side work (DB call, backend request, etc.)
+  await new Promise((r) => setTimeout(r, 100));
+
+  return { id: "p1", name: "Wireless Mouse", priceCents: 2999 };
+}
+
+export default async function FeaturedProductCard() {
+  const product = await getFeaturedProduct();
+
+  return (
+    <section style={{ padding: 16, border: "1px solid #ddd" }}>
+      <h2>Featured</h2>
+      <p>{product.name}</p>
+      <p>${(product.priceCents / 100).toFixed(2)}</p>
+      <small>Product ID: {product.id}</small>
+    </section>
+  );
+}
+```
+
+### Step 2: Create a client component for interactivity
+
+Create `project/components/client/Counter.tsx`:
+
+```typescript
+// project/components/client/Counter.tsx
+"use client";
+
+import { useState } from "react";
+
+export function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div style={{ marginTop: 16 }}>
+      <button onClick={() => setCount((c) => c + 1)}>Increment</button>
+      <p>Count: {count}</p>
+    </div>
+  );
+}
+```
+
+### Step 3: Compose them in a page
+
+Update `project/app/page.tsx`:
+
+```typescript
+// project/app/page.tsx
+import FeaturedProductCard from "../components/server/FeaturedProduct";
+import { Counter } from "../components/client/Counter";
+
+export default function Home() {
+  return (
+    <main style={{ padding: 24 }}>
+      <h1>Components Deep Dive</h1>
+      <FeaturedProductCard />
+      <Counter />
+    </main>
+  );
+}
+```
+
+### Step 4: Understand the boundary rule
+
+Server components can render client components, but:
+- ✅ pass **serializable** props (strings, numbers, booleans, plain objects)
+- ❌ do not pass functions, class instances, DB clients, or non-serializable values
 
 ## Server Components (Default)
 
@@ -141,7 +238,7 @@ export function Card({ title, children }: CardProps) {
 
 Organize components in a predictable structure:
 
-```
+```text
 src/
   components/
     ui/
@@ -152,6 +249,21 @@ src/
       Footer.tsx
   app/
     page.tsx
+```
+
+## Complete Example: Server + Client Components in One Page
+
+After completing the steps above, your `project/` should include:
+
+```text
+project/
+├── app/
+│   └── page.tsx
+└── components/
+    ├── client/
+    │   └── Counter.tsx
+    └── server/
+        └── FeaturedProduct.tsx
 ```
 
 ## Real-World Scenario: Building a Product Page
@@ -215,6 +327,26 @@ Strong prop types make components easy to use correctly and hard to misuse.
 **Solutions:**
 1. Replace function props with serializable data props.
 2. Move the logic into the client component or use server actions (advanced topic).
+
+## Testing Your Implementation
+
+### Manual test checklist
+
+1. Run `pnpm dev`.
+2. Visit `/`.
+3. Confirm:
+   - the “Featured” card renders (server component)
+   - clicking “Increment” updates the count (client component)
+
+### Build-time check
+
+```bash
+pnpm build
+```
+
+If you see errors about hooks or serialization, double-check:
+- `"use client"` is present at the top of the component using hooks
+- you are not passing non-serializable props from server → client
 
 ## Next Steps
 

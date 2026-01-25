@@ -31,7 +31,7 @@ import Image from 'next/image';
 
 ## Organize Components
 
-```
+```text
 src/
 ├── app/           # Pages and routes
 ├── components/    # Reusable components

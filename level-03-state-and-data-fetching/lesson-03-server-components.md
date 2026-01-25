@@ -9,6 +9,17 @@ By the end of this lesson, you will be able to:
 - Understand common composition patterns (server shell + client widgets)
 - Recognize common pitfalls (hooks in server components, non-serializable props, accidental client bloat)
 
+## Prerequisites
+
+Before you start, make sure you have:
+
+1. A Next.js App Router project created (follow `fs-course-frontend/LEARNING-GUIDE.md`)
+2. A working `project/` folder where you’re writing code for this course (recommended location: `fs-course-frontend/project/`)
+3. Basic familiarity with:
+   - React components and props
+   - `fetch` and async/await
+   - TypeScript object types
+
 ## Why Server Components Matter
 
 Server Components help you ship less JavaScript to the browser while still building rich UIs.
@@ -26,6 +37,109 @@ flowchart LR
   stream --> browser[Browser]
   browser --> client[ClientComponentsForInteractivity]
 ```
+
+## Basic Implementation
+
+In this deep dive, you’ll build a small “Product Page” using the most common Server/Client composition pattern:
+
+- **Server component**: loads data and renders the page shell
+- **Client component**: handles interactive UI (button clicks, local state)
+
+### Step 1: Create a server-only data function
+
+Create `project/lib/products.ts`:
+
+```typescript
+// project/lib/products.ts
+export type Product = {
+  id: string;
+  name: string;
+  priceCents: number;
+};
+
+// In a real app, this could query a DB or call your backend API.
+export async function getProductById(id: string): Promise<Product> {
+  // Simulate server-side work
+  await new Promise((r) => setTimeout(r, 150));
+
+  // Minimal demo data
+  return {
+    id,
+    name: id === "1" ? "Wireless Mouse" : "Keyboard",
+    priceCents: id === "1" ? 2999 : 4999,
+  };
+}
+```
+
+Why this belongs on the server:
+- it can safely use secrets/DB connections (not shown here)
+- it avoids shipping this code to the browser
+
+### Step 2: Create a server page that fetches and renders data
+
+Create `project/app/products/[id]/page.tsx`:
+
+```typescript
+// project/app/products/[id]/page.tsx
+import { getProductById } from "../../../lib/products";
+import { AddToCartButton } from "./AddToCartButton";
+
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const product = await getProductById(id);
+
+  return (
+    <main style={{ padding: 24 }}>
+      <h1>{product.name}</h1>
+      <p>Price: ${(product.priceCents / 100).toFixed(2)}</p>
+
+      {/* Client Component for interactivity */}
+      <AddToCartButton productId={product.id} />
+    </main>
+  );
+}
+```
+
+Key point:
+- This file is a **Server Component** by default (no `"use client"`), so it can `await` data directly.
+
+### Step 3: Add a client component for interactivity
+
+Create `project/app/products/[id]/AddToCartButton.tsx`:
+
+```typescript
+// project/app/products/[id]/AddToCartButton.tsx
+"use client";
+
+import { useState } from "react";
+
+export function AddToCartButton({ productId }: { productId: string }) {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div style={{ marginTop: 16 }}>
+      <button onClick={() => setCount((c) => c + 1)}>Add to cart</button>
+      <p style={{ marginTop: 8 }}>Added: {count}</p>
+
+      {/* Demonstrates boundary-safe props: string is serializable */}
+      <small>Product ID: {productId}</small>
+    </div>
+  );
+}
+```
+
+### Step 4: Learn the boundary rule (serializable props only)
+
+The server → client boundary only allows **serializable** data:
+- ✅ strings, numbers, booleans
+- ✅ plain objects/arrays (JSON-like)
+- ❌ functions
+- ❌ class instances
+- ❌ database clients / connections
 
 ## Server Components by Default (App Router)
 
@@ -110,6 +224,26 @@ Typical pattern:
 
 This keeps sensitive logic on the server but still provides a great UX.
 
+## Complete Example: Product Page (Server + Client Composition)
+
+Here’s what you should have after completing the steps above:
+
+```text
+project/
+└── app/
+    └── products/
+        └── [id]/
+            ├── AddToCartButton.tsx   # client component
+            └── page.tsx              # server component
+project/
+└── lib/
+    └── products.ts                   # server-only data function
+```
+
+Try visiting:
+- `http://localhost:3000/products/1`
+- `http://localhost:3000/products/2`
+
 ## Best Practices
 
 ### 1) Default to server; isolate interactivity
@@ -163,6 +297,26 @@ Adding `"use client"` at the top of a large layout can ship a lot of JS.
 **Solutions:**
 1. Replace function props with serializable data props.
 2. Move the logic into the client component.
+
+## Testing Your Implementation
+
+### Manual smoke test
+
+1. Start the dev server from your `project/` folder (per `LEARNING-GUIDE.md`).
+2. Visit `http://localhost:3000/products/1`.
+3. Confirm:
+   - product name + price render immediately (server-rendered)
+   - button increments “Added” count (client interactivity)
+
+### Build-time safety checks
+
+Run a production build (this catches many Server/Client boundary mistakes early):
+
+```bash
+pnpm build
+```
+
+If you see errors about hooks or serialization, use the Troubleshooting section above to fix the boundary.
 
 ## Next Steps
 

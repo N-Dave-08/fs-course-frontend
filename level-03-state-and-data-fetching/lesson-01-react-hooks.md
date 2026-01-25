@@ -9,7 +9,7 @@ By the end of this lesson, you will be able to:
 - Avoid common hook pitfalls (stale closures, infinite effects, derived state)
 - Create custom hooks to reuse stateful logic across components
 
-## Why Hooks Matter
+## Why Using Hooks Correctly Matters
 
 Hooks are how modern React manages:
 - state (data that changes over time)

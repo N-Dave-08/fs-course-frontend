@@ -43,7 +43,7 @@ This course consists of **6 progressive levels**:
 
 ## File Structure
 
-```
+```text
 fs-course-frontend/
 ├── README.md (this file)
 ├── LEARNING-GUIDE.md (setup instructions)

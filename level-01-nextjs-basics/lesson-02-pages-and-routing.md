@@ -9,6 +9,14 @@ By the end of this lesson, you will be able to:
 - Navigate between routes using `next/link`
 - Recognize common routing pitfalls (wrong file placement, missing `page.tsx`, layout misunderstandings)
 
+## Prerequisites
+
+Before you start, make sure you have:
+
+1. A Next.js App Router project created (follow `fs-course-frontend/LEARNING-GUIDE.md`)
+2. A working `project/` folder (recommended: `fs-course-frontend/project/`)
+3. The dev server running (`pnpm dev`) at least once successfully
+
 ## Why Routing Matters
 
 Routing is the backbone of any web app:
@@ -25,11 +33,113 @@ flowchart TD
   segment --> layout[layout.tsx]
 ```
 
+## Basic Implementation
+
+In this deep dive, you’ll implement:
+
+- **two static routes**: `/` and `/about`
+- **one dynamic route**: `/blog/[slug]`
+- **a nested layout** that wraps only the blog section
+- **navigation** that uses `next/link`
+
+### Step 1: Ensure you have a root layout + nav
+
+Create or update `project/app/layout.tsx`:
+
+```typescript
+// project/app/layout.tsx
+import type { ReactNode } from "react";
+import Link from "next/link";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body style={{ fontFamily: "system-ui, sans-serif" }}>
+        <header style={{ padding: 24, borderBottom: "1px solid #ddd" }}>
+          <nav style={{ display: "flex", gap: 12 }}>
+            <Link href="/">Home</Link>
+            <Link href="/about">About</Link>
+            <Link href="/blog/hello-world">Blog example</Link>
+          </nav>
+        </header>
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+### Step 2: Create a static route (`/about`)
+
+Create `project/app/about/page.tsx`:
+
+```typescript
+// project/app/about/page.tsx
+export default function AboutPage() {
+  return (
+    <main style={{ padding: 24 }}>
+      <h1>About</h1>
+      <p>This is a static route because it’s `app/about/page.tsx`.</p>
+    </main>
+  );
+}
+```
+
+### Step 3: Create a dynamic route (`/blog/[slug]`)
+
+Create `project/app/blog/[slug]/page.tsx`:
+
+```typescript
+// project/app/blog/[slug]/page.tsx
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+
+  return (
+    <main style={{ padding: 24 }}>
+      <h1>Blog Post</h1>
+      <p>Slug: {slug}</p>
+    </main>
+  );
+}
+```
+
+Why a dynamic route matters:
+- one “route template” can serve many URLs
+- the URL becomes part of your component input (`params`)
+
+### Step 4: Add a nested blog layout
+
+Create `project/app/blog/layout.tsx`:
+
+```typescript
+// project/app/blog/layout.tsx
+import type { ReactNode } from "react";
+
+export default function BlogLayout({ children }: { children: ReactNode }) {
+  return (
+    <section style={{ padding: 24 }}>
+      <aside style={{ marginBottom: 16, color: "#555" }}>
+        <strong>Blog layout:</strong> this wrapper only applies to /blog/*
+      </aside>
+      {children}
+    </section>
+  );
+}
+```
+
+This is the key mental model:
+- `app/layout.tsx` wraps everything
+- `app/blog/layout.tsx` wraps only the blog segment and its children
+
 ## File-Based Routing (App Router)
 
 In the App Router, the file structure determines routes:
 
-```
+```text
 app/
 ├── page.tsx          → / (home)
 ├── about/
@@ -65,7 +175,7 @@ export default function About() {
 
 Use `[param]` for dynamic segments:
 
-```
+```text
 app/
 └── blog/
     └── [slug]/
@@ -136,6 +246,28 @@ Typical apps have:
 
 With App Router, you can create layout boundaries (e.g., dashboard sidebar) as nested layouts.
 
+## Complete Example: Static + Dynamic + Nested Layout
+
+After completing the steps above, your `project/` should include:
+
+```text
+project/
+└── app/
+    ├── layout.tsx
+    ├── page.tsx
+    ├── about/
+    │   └── page.tsx
+    └── blog/
+        ├── layout.tsx
+        └── [slug]/
+            └── page.tsx
+```
+
+Try visiting:
+- `http://localhost:3000/about`
+- `http://localhost:3000/blog/hello-world`
+- `http://localhost:3000/blog/another-post`
+
 ## Best Practices
 
 ### 1) Use layouts for shared UI
@@ -184,6 +316,24 @@ It keeps routing fast and consistent.
 **Solutions:**
 1. Use `next/link` for internal navigation.
 2. Avoid `<a href="/...">` for internal routes unless you intentionally want a reload.
+
+## Testing Your Implementation
+
+### Manual test checklist
+
+1. Run `pnpm dev`.
+2. Visit `/about` and confirm it renders.
+3. Visit `/blog/hello-world` and confirm you see the slug.
+4. Confirm the blog page shows the “Blog layout” wrapper (nested layout works).
+5. Click the nav links and confirm routing is fast (no full reload).
+
+### Build-time check
+
+```bash
+pnpm build
+```
+
+If you hit TypeScript errors around `params`, ensure your page function signature matches your Next.js version expectations and keep it consistent across your project.
 
 ## Next Steps
 
