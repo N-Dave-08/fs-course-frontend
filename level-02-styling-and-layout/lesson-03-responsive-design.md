@@ -144,6 +144,10 @@ Typical pattern:
 Build the mobile layout first, then add breakpoints only where needed.
 
 ### 2) Use spacing + containers to maintain readability
+
+On small screens, readability usually improves more from **consistent spacing** than from complex layouts.
+Default to a centered container with mobile padding (e.g., `px-4 sm:px-6 lg:px-8`) and avoid very wide text blocks.
+
 ### 3) Prefer fewer breakpoints
 
 If you have `sm:`, `md:`, `lg:`, `xl:` on every element, the UI becomes hard to maintain.
@@ -171,29 +175,9 @@ Add breakpoints only where the layout meaningfully changes.
 
 Often the biggest mobile problem is missing padding and too-wide text blocks.
 
-### 3) Prefer responsive primitives over one-off hacks
+### 4) Prefer responsive primitives over one-off hacks
 
 Use `grid-cols-*`, `flex-col`, `gap-*`, `max-w-*` instead of lots of manual margins.
-
-## Common Pitfalls and Solutions
-
-### Pitfall 1: Designing only for desktop
-
-**Problem:** On mobile, everything overflows or is too cramped.
-
-**Solution:** Add container padding (`px-4`) and mobile-first stacking (`flex-col`).
-
-### Pitfall 2: Too many breakpoints
-
-**Problem:** UI becomes hard to reason about because every element changes at every size.
-
-**Solution:** Use breakpoints sparingly—only where the layout actually needs to change.
-
-### Pitfall 3: Images causing layout jumps
-
-**Problem:** Content moves when images load.
-
-**Solution:** Provide `width`/`height` (or use patterns that reserve space) and avoid unknown dimensions.
 
 ## Troubleshooting
 

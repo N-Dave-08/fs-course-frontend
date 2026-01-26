@@ -148,6 +148,11 @@ This keeps sensitive logic on the server but still provides a great UX.
 Make client components small and leaf-level when possible.
 
 ### 2) Keep data fetching close to the route
+
+Fetching close to the route improves clarity and reduces accidental duplicate requests:
+- the page/segment owns “what data is needed”
+- small child components stay focused on rendering (or interactivity if client)
+
 ### 3) Treat the server/client boundary as an API boundary
 
 Only pass what you’re comfortable “shipping” to the browser:
@@ -156,7 +161,7 @@ Only pass what you’re comfortable “shipping” to the browser:
 
 Fetch in server pages/layouts and pass down typed, serializable data.
 
-### 3) Avoid unnecessary `"use client"`
+### 4) Avoid unnecessary `"use client"`
 
 Adding `"use client"` at the top of a large layout can ship a lot of JS.
 
@@ -190,9 +195,12 @@ Adding `"use client"` at the top of a large layout can ship a lot of JS.
 
 ### Issue: “Functions cannot be passed to Client Components”
 
+**Symptoms:**
+- error about passing functions across the server→client boundary
+
 **Fixes:**
 1. Replace function props with serializable data props.
-2. Move logic into the client component or keep it server-side.
+2. Move the logic into the client component (or keep it server-side).
 
 ### Issue: "You're importing a component that needs useState/useEffect..."
 
@@ -202,15 +210,6 @@ Adding `"use client"` at the top of a large layout can ship a lot of JS.
 **Solutions:**
 1. Ensure the component using hooks has `"use client"`.
 2. Split the component: server shell + client widget.
-
-### Issue: "Functions cannot be passed to Client Components..."
-
-**Symptoms:**
-- error about passing functions across boundary
-
-**Solutions:**
-1. Replace function props with serializable data props.
-2. Move the logic into the client component.
 
 ## Next Steps
 

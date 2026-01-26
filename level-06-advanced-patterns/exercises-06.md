@@ -6,6 +6,7 @@ By completing these exercises, you will:
 - ✅ Optimize images with Next.js Image
 - ✅ Implement code splitting
 - ✅ Monitor performance
+- ✅ Write a basic frontend test (and understand where the full testing track lives)
 - ✅ Improve Core Web Vitals
 - ✅ Reduce bundle size
 - ✅ Practice optimization techniques
@@ -170,6 +171,50 @@ export default function PerformancePage() {
 
 ---
 
+## Exercise 4: Testing (Quick Alignment with Lesson 03)
+
+**Objective:** Write one small test so this level’s exercises align with the “Testing” lesson.
+
+> For the full testing setup (Jest/RTL/Playwright configuration), follow `fs-course-testing`. This exercise is intentionally minimal.
+
+### Option A (recommended): Add a small component test (React Testing Library)
+
+Create `project/src/components/Button.tsx` (or reuse an existing button) and write a test at:
+- `project/src/components/__tests__/Button.test.tsx`
+
+**Expected test shape (conceptual):**
+
+```typescript
+import { render, screen } from "@testing-library/react";
+import Button from "../Button";
+
+test("renders the button label", () => {
+  render(<Button label="Save" onClick={() => {}} />);
+  expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
+});
+```
+
+### Option B: Add a tiny E2E test (Playwright)
+
+Create an E2E test file at:
+- `project/src/e2e/navigation.spec.ts`
+
+**Expected test shape (conceptual):**
+
+```typescript
+import { test, expect } from "@playwright/test";
+
+test("homepage loads", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading")).toBeVisible();
+});
+```
+
+**Verification:**
+- Your test uses **roles** (not brittle CSS selectors)
+- The test asserts **user-visible behavior**
+- You know where to go next for full coverage: `fs-course-testing/`
+
 ## Running Exercises
 
 ### Test Performance
@@ -186,6 +231,7 @@ pnpm dev
 - [ ] Images optimized
 - [ ] Code splitting works
 - [ ] Performance monitored
+- [ ] At least one test written (RTL or Playwright)
 - [ ] Bundle size reduced
 - [ ] Core Web Vitals improved
 

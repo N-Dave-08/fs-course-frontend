@@ -43,7 +43,7 @@ Create `project/src/app/login/page.tsx` that:
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import apiClient from '@/lib/api-client';
+import { apiClient, ApiError } from "@/lib/api-client";
 
 interface LoginData {
   email: string;
@@ -77,7 +77,10 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const response = await apiClient.post<LoginResponse>('/api/auth/login', formData);
+      const response = await apiClient<LoginResponse>("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
 
       if (response.success && response.data.token) {
         // Store token in localStorage
@@ -87,8 +90,12 @@ export default function LoginPage() {
         // Redirect to dashboard
         router.push('/dashboard');
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+    } catch (err: unknown) {
+      const message =
+        typeof err === "object" && err && "message" in err
+          ? String((err as ApiError).message)
+          : "Login failed";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -279,7 +286,7 @@ Create `project/src/contexts/AuthContext.tsx`:
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import apiClient from '@/lib/api-client';
+import { apiClient, ApiError } from "@/lib/api-client";
 
 interface User {
   id: number;
@@ -321,10 +328,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await apiClient.post<{
+      const response = await apiClient<{
         success: boolean;
         data: { token: string; user: User };
-      }>('/api/auth/login', { email, password });
+      }>("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
 
       if (response.success && response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -332,8 +342,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(response.data.user);
         router.push('/dashboard');
       }
-    } catch (error) {
-      throw error;
+    } catch (err: unknown) {
+      const message =
+        typeof err === "object" && err && "message" in err
+          ? String((err as ApiError).message)
+          : "Login failed";
+      throw new Error(message);
     }
   };
 

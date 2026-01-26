@@ -16,7 +16,7 @@ By completing these exercises, you will:
 - Next.js basics (Level 1)
 - Understanding of React hooks
 - TypeScript knowledge
-- API integration knowledge
+- Basic `fetch` knowledge (you’ll build a stronger API client in Level 4)
 
 **Setup:**
 1. Navigate to `fs-course-frontend/level-03-state-and-data-fetching/`

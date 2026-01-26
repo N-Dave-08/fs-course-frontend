@@ -31,85 +31,51 @@ By completing these exercises, you will:
 
 **Instructions:**
 Create `project/src/lib/api-client.ts` that:
-1. Handles GET requests
-2. Includes error handling
-3. Uses environment variable for base URL
+1. Builds full URLs from a base URL
+2. Handles JSON requests/responses consistently
+3. Represents API errors in a predictable shape (so UI can handle them)
 
 **Expected Code Structure:**
 ```typescript
 // project/src/lib/api-client.ts
-interface ApiClientOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  body?: any;
-  headers?: Record<string, string>;
-}
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-class ApiClient {
-  private baseURL: string;
+export type ApiError = {
+  status: number;
+  message: string;
+  details?: unknown;
+};
 
-  constructor(baseURL?: string) {
-    this.baseURL = baseURL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  }
+export async function apiClient<T>(
+  endpoint: string,
+  options?: RequestInit
+): Promise<T> {
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(options?.headers ?? {}),
+    },
+    ...options,
+  });
 
-  async request<T>(
-    endpoint: string,
-    options: ApiClientOptions = {}
-  ): Promise<T> {
-    const { method = 'GET', body, headers = {} } = options;
-
-    const url = `${this.baseURL}${endpoint}`;
-    
-    const config: RequestInit = {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-    };
-
-    if (body && method !== 'GET') {
-      config.body = JSON.stringify(body);
-    }
-
+  if (!response.ok) {
+    let details: unknown = undefined;
     try {
-      const response = await fetch(url, config);
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({
-          error: `HTTP ${response.status}: ${response.statusText}`,
-        }));
-        throw new Error(error.error || 'Request failed');
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
+      details = await response.json();
+    } catch {
+      // empty or non-JSON error body
     }
+
+    const error: ApiError = {
+      status: response.status,
+      message: response.statusText || "Request failed",
+      details,
+    };
+    throw error;
   }
 
-  // Convenience methods
-  async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'GET' });
-  }
-
-  async post<T>(endpoint: string, body: any): Promise<T> {
-    return this.request<T>(endpoint, { method: 'POST', body });
-  }
-
-  async put<T>(endpoint: string, body: any): Promise<T> {
-    return this.request<T>(endpoint, { method: 'PUT', body });
-  }
-
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
-  }
+  return response.json();
 }
-
-// Export singleton instance
-export const apiClient = new ApiClient();
-export default apiClient;
 ```
 
 **Verification:**
@@ -134,7 +100,7 @@ Create `project/src/app/users/page.tsx` that:
 **Expected Code Structure:**
 ```typescript
 // project/src/app/users/page.tsx
-import apiClient from '@/lib/api-client';
+import { apiClient } from "@/lib/api-client";
 
 interface User {
   id: number;
@@ -148,7 +114,7 @@ interface ApiResponse {
 }
 
 async function getUsers(): Promise<User[]> {
-  const response = await ApiResponse = await apiClient.get<ApiResponse>('/api/users');
+const response = await apiClient<ApiResponse>("/api/users");
   return response.data;
 }
 
@@ -222,7 +188,7 @@ Create `project/src/components/UserForm.tsx` that:
 "use client";
 
 import { useState } from 'react';
-import apiClient from '@/lib/api-client';
+import { apiClient, ApiError } from "@/lib/api-client";
 
 interface UserFormData {
   name: string;
@@ -245,14 +211,18 @@ export default function UserForm() {
     setSuccess(false);
 
     try {
-      await apiClient.post('/api/users', formData);
+      await apiClient("/api/users", { method: "POST", body: JSON.stringify(formData) });
       setSuccess(true);
       setFormData({ name: '', email: '' }); // Reset form
       
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create user');
+    } catch (err: unknown) {
+      const message =
+        typeof err === "object" && err && "message" in err
+          ? String((err as ApiError).message)
+          : "Failed to create user";
+      setError(message);
     } finally {
       setLoading(false);
     }

@@ -128,6 +128,11 @@ Place `loading.tsx` in the route segment that needs it:
 
 ### Unexpected errors
 
+- 500 server bugs
+- code bugs in your app
+
+Your UI should not treat these all the same.
+
 ## Advanced Patterns (Preview)
 
 ### 1) Error codes over English strings
@@ -147,11 +152,6 @@ In production apps, you usually:
 - log errors server-side (API)
 - capture client errors (Sentry or similar)
 - correlate issues with request ids
-
-- 500 server bugs
-- code bugs in your app
-
-Your UI should not treat these all the same.
 
 ## Real-World Scenario: Showing Better Messages
 
