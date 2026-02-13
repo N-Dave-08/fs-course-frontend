@@ -232,6 +232,77 @@ Check `res.ok` so you don’t silently render “undefined” data.
 
 Use typed DTOs (`type Post = ...`) so you don’t spread `any` through your UI.
 
+## API Clients and Libraries
+
+While the built-in `fetch` is sufficient, many teams prefer libraries for convenience, error handling, and features.
+
+### `axios` (HTTP client)
+- Axios provides a nicer API for request/response transforms, interceptors, and automatic JSON parsing.
+- It works in both server and client code (Node + browser).
+
+Basic axios example (client):
+
+```typescript
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+export default function ClientPostsAxios() {
+  const [posts, setPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    axios.get('/api/posts')
+      .then((res) => !cancelled && setPosts(res.data))
+      .catch((e) => console.error(e));
+    return () => { cancelled = true; };
+  }, []);
+
+  return <div>{posts.map(p => <div key={p.id}>{p.title}</div>)}</div>;
+}
+```
+
+Use axios interceptors for auth token injection and centralized error handling.
+
+### React Query / SWR (data-fetching + caching)
+- For complex client caching, background revalidation, optimistic updates, retries, and pagination, use React Query (TanStack Query) or SWR.
+- These libraries provide hooks that manage loading/error state, cache, and background refetching.
+
+React Query example (client):
+
+```typescript
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
+
+function fetchPosts() {
+  return axios.get('/api/posts').then(r => r.data)
+}
+
+export function PostsList() {
+  const { data, error, isLoading } = useQuery(['posts'], fetchPosts, { staleTime: 1000 * 60 });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error</div>;
+
+  return <div>{data.map((p:any) => <div key={p.id}>{p.title}</div>)}</div>;
+}
+```
+
+When to use these libraries:
+- Use React Query/SWR when you need caching, background revalidation, pagination helpers, or optimistic updates.
+- Keep server components for initial rendering and React Query in client components for interactive caching.
+
+### Mutations, pagination, optimistic updates
+- Use library-provided `useMutation` and query invalidation patterns for safe updates.
+- For pagination, prefer cursor-based approaches and use library helpers or fetch-more patterns.
+
+## Errors, Retries, and Backoff
+
+- Use exponential backoff for retries; many libraries provide built-in retry strategies.
+- Surface errors clearly to the user and log server-side when appropriate.
+
+## Exercises (data fetching + libraries)
+
+
 ## Common Pitfalls and Solutions
 
 ### Pitfall 1: Double fetching (server + client)

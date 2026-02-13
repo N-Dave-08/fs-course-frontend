@@ -281,6 +281,159 @@ Now that you understand hooks:
 3. 📖 **Next Lesson**: Learn about [Data Fetching](./lesson-02-data-fetching.md)
 4. 💻 **Complete Exercises**: Work through [Exercises 03](./exercises-03.md)
 
+---
+
+## Advanced Hook Topics (expanded)
+
+### `useRef` and imperative handles
+- `useRef` stores a mutable value that persists across renders without causing re-renders.
+- Use refs for DOM access, timers, and mutable counters.
+
+```typescript
+import { useRef, useEffect } from "react";
+
+export function Timer() {
+  const idRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    idRef.current = window.setInterval(() => console.log("tick"), 1000);
+    return () => {
+      if (idRef.current) window.clearInterval(idRef.current);
+    };
+  }, []);
+
+  return <div>Timer running (check console)</div>;
+}
+```
+
+### `useReducer` for complex state
+- Use `useReducer` when state transitions are complex, when actions are explicit, or when many related state variables exist.
+
+```typescript
+import { useReducer } from "react";
+
+type State = { count: number; loading: boolean };
+type Action = { type: "inc" } | { type: "dec" } | { type: "start" } | { type: "done" };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "inc":
+      return { ...state, count: state.count + 1 };
+    case "dec":
+      return { ...state, count: state.count - 1 };
+    case "start":
+      return { ...state, loading: true };
+    case "done":
+      return { ...state, loading: false };
+  }
+}
+
+export function ComplexCounter() {
+  const [state, dispatch] = useReducer(reducer, { count: 0, loading: false });
+  return (
+    <div>
+      <div>Count: {state.count}</div>
+      <button onClick={() => dispatch({ type: "inc" })}>+1</button>
+      <button onClick={() => dispatch({ type: "dec" })}>-1</button>
+    </div>
+  );
+}
+```
+
+### `useCallback`/`useMemo` caveats
+- `useCallback` and `useMemo` are performance tools — not correctness tools. Only add them when you have a measurable re-render or referential stability problem.
+- Overusing these hooks can add complexity and memory overhead.
+
+### Custom Hook Patterns
+- Keep custom hooks focused: a single responsibility (e.g., `useAuth`, `useFetch`, `useFormState`).
+- Return stable references (use `useCallback`/`useMemo`) only when consumers rely on referential equality.
+
+Example: `useFetch` pattern (simple):
+
+```typescript
+import { useEffect, useState } from "react";
+
+export function useFetch<T>(url: string) {
+  const [data, setData] = useState<T | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetch(url)
+      .then((r) => {
+        if (!r.ok) throw new Error(String(r.status));
+        return r.json();
+      })
+      .then((d) => !cancelled && setData(d))
+      .catch((e) => !cancelled && setError(e instanceof Error ? e.message : String(e)))
+      .finally(() => !cancelled && setLoading(false));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  return { data, error, loading } as const;
+}
+```
+
+### Testing Hooks
+- Use `@testing-library/react` and `renderHook` from `@testing-library/react-hooks` or the `@testing-library/react` utilities for testing hooks and components.
+- Test behavior (state transitions, effects, cleanup) and avoid testing implementation details.
+
+Example test sketch:
+
+```typescript
+// pseudo-code
+// const { result, waitForNextUpdate } = renderHook(() => useFetch('/api/test'))
+// await waitForNextUpdate();
+// expect(result.current.data).toBeDefined();
+```
+
+## State Management Overview
+
+When component state becomes shared or complex, consider a global/state library. Options and tradeoffs:
+
+- Context + local reducers: good for small apps; minimal deps.
+- Redux: explicit, predictable, large ecosystem; good for large apps or teams that need strict patterns and devtools.
+- Zustand: minimal API, small bundle, simple for many apps — good middle ground.
+- Recoil/MobX: alternative models (atom-based, observable) for specific use cases.
+
+When to choose:
+- tiny apps: React Context + hooks
+- apps with complex state and many devs: Redux
+- apps that want small DX and minimal boilerplate: Zustand
+
+Small `zustand` example:
+
+```typescript
+// store.ts
+import create from 'zustand'
+
+type State = { count: number; inc: () => void }
+export const useStore = create<State>((set) => ({
+  count: 0,
+  inc: () => set((s) => ({ count: s.count + 1 })),
+}));
+
+// component
+export function CounterZustand() {
+  const { count, inc } = useStore();
+  return <button onClick={inc}>Count: {count}</button>;
+}
+```
+
+## Exercises (advanced)
+
+See the exercises for this level in [Exercises 03](./exercises-03.md).
+
+## Further Reading
+- React docs: Hooks reference and Rules of Hooks
+- Zustand: https://github.com/pmndrs/zustand
+- Redux Toolkit: https://redux-toolkit.js.org/
+
 ## Additional Resources
 
 - [React Docs: State](https://react.dev/learn/state-a-components-memory)

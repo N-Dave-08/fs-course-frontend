@@ -436,6 +436,106 @@ export default function Settings() {
 
 ---
 
+## Exercise 5: Data fetching libraries (axios / React Query)
+**Objective:** Practice using a dedicated HTTP client and a client caching library; learn how to integrate them into a Next.js app and common pitfalls.
+
+**Instructions:**
+- Task A — Axios & interceptor:
+  - Create an `axios` instance at `project/src/lib/api.ts` with a sensible `baseURL` (use `NEXT_PUBLIC_API_URL`) and a request interceptor that attaches `Authorization: Bearer <token>` when a token exists (from `localStorage` or a token hook).
+  - Replace the client `fetch` in `project/src/components/DataFetcher.tsx` with an axios-based component `project/src/components/DataFetcherAxios.tsx` that uses the axios instance.
+
+- Task B — React Query (TanStack Query):
+  - Add `@tanstack/react-query` and provide a `QueryClient` in your app root (`project/src/app/layout.tsx` or `project/src/pages/_app.tsx`).
+  - Implement `project/src/components/PostsListRQ.tsx` that uses `useQuery(['posts'], fetchPosts)` where `fetchPosts` calls the axios instance (`api.get('/posts').then(r => r.data)`).
+  - Implement `project/src/components/CreatePostForm.tsx` that uses `useMutation` to post data and performs optimistic updates / invalidates the `posts` query on success.
+
+- Task C — Pagination (optional advanced):
+  - Implement cursor-based pagination using React Query's `useInfiniteQuery` (`getNextPageParam` / `fetchNextPage`) or implement a manual `Load more` button that calls `/api/posts?page=2` and appends results in the UI.
+
+**Expected Code Structure (snippets):**
+
+`project/src/lib/api.ts`
+```typescript
+import axios from 'axios';
+
+const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL || '' });
+
+api.interceptors.request.use((config) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+export default api;
+```
+
+`project/src/app/layout.tsx` (provider)
+```tsx
+"use client";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+const queryClient = new QueryClient();
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+}
+```
+
+`project/src/components/PostsListRQ.tsx`
+```tsx
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
+
+function fetchPosts() { return api.get('/posts').then(r => r.data); }
+
+export function PostsList() {
+  const { data, isLoading, error } = useQuery(['posts'], fetchPosts);
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error</div>;
+  return <div>{data.map((p: any) => <div key={p.id}>{p.title}</div>)}</div>;
+}
+```
+
+**Verification Steps:**
+1. Axios: the axios-based component loads data and behaves like the fetch-based version; the axios instance adds the `Authorization` header when a token exists.
+2. React Query: `PostsList` uses `useQuery` and shows loading/error states correctly; creating a post via `useMutation` performs optimistic update and then syncs with the server.
+3. Pagination: `Load more` or infinite query loads more pages and appends results; handles end-of-list and errors.
+
+**Hints:**
+- Use axios interceptors for auth header injection and centralized error transforms.
+- Keep React Query usage inside client components; use server components for initial render when appropriate.
+
+**Common Mistakes:**
+- Forgetting to wrap app in `QueryClientProvider` (queries do nothing).
+- Storing secrets in `NEXT_PUBLIC_*` — avoid putting private keys in public env vars.
+
+**Files:** `project/src/lib/api.ts`, `project/src/components/DataFetcherAxios.tsx`, `project/src/components/PostsListRQ.tsx`, `project/src/components/CreatePostForm.tsx`
+
+---
+
+## Advanced Exercises
+
+1. Rewrite a multi-input form to use `useReducer` and add tests that assert reducer transitions and edge cases.
+
+  - Objective: practice reducer-based state and unit testing reducers.
+  - Instructions: convert a multi-field form into a component using `useReducer` with explicit action types; add unit tests for reducer logic (inputs, reset, submit error path).
+  - Expected Code/File: `project/src/components/FormWithReducer.tsx`, reducer in `project/src/components/formReducer.ts` and tests in `project/src/components/__tests__/formReducer.test.ts`.
+  - Verification: reducer tests pass and component behaves correctly when interacting with inputs.
+
+2. Build a `useDebouncedValue` custom hook and use it to debounce a search input component; include tests for timing behavior.
+
+  - Objective: implement a reusable hook for debouncing values and test timings.
+  - Instructions: create `project/src/hooks/useDebouncedValue.ts` (accepts `value` and `delay` ms); use in `project/src/components/SearchWithDebounce.tsx`. Add tests using fake timers to assert debounce behavior.
+  - Expected Code/File: `project/src/hooks/useDebouncedValue.ts`, `project/src/components/SearchWithDebounce.tsx`, tests under `project/src/hooks/__tests__/useDebouncedValue.test.ts`.
+  - Verification: tests assert value updates only after delay and cleanup on unmount.
+
+3. Add `zustand` to the project and migrate a small piece of shared state (theme toggle or simple counter); show how to replace the Context pattern with a small `zustand` store and update components.
+
+  - Objective: demonstrate a minimal global state migration with `zustand` and explain tradeoffs versus Context/Redux.
+  - Instructions: create `project/src/store/useAppStore.ts` with a simple store (`count`, `inc`, `toggleTheme`), update components to use the store, and add a short README note describing the migration.
+  - Expected Code/File: `project/src/store/useAppStore.ts`, updated components (e.g., `project/src/components/ThemeToggle.tsx`), and a small `project/docs/zustand-migration.md`.
+  - Verification: components read and update state via `useAppStore` and no Context provider is required.
+
+
 ## Running Exercises
 
 ### Start Development Server
@@ -447,10 +547,21 @@ pnpm dev
 
 ### Test Components
 
-1. **NameForm**: Add to any page, test input
-2. **DataFetcher**: Add to page, verify data loads
-3. **Data Page**: Visit `/data`, check server-side fetch
-4. **Custom Hook**: Use in component, test persistence
+1. **NameForm** (`project/src/components/NameForm.tsx`)
+  - Add the component to a development page (e.g., `project/src/app/page.tsx`) and verify typing updates the UI in real time.
+  - Expected: input updates state immediately, no full-page reload, and displayed greeting updates.
+
+2. **DataFetcher** (`project/src/components/DataFetcher.tsx` or `project/src/components/DataFetcherAxios.tsx`)
+  - Add to a page and verify loading → data → success flow. Simulate an error (bad URL) to verify error UI.
+  - Expected: loading indicator appears, fetched items render, and errors show a clear message.
+
+3. **Data Page** (`project/src/app/data/page.tsx`)
+  - Visit `/data` in the browser and view page source (or disable JS) to confirm the posts are present in the server-rendered HTML.
+  - Expected: initial HTML contains posts (no client fetch needed) and page loads without client-side spinner.
+
+4. **Custom Hook** (`project/src/hooks/useLocalStorage.ts`) and usage (e.g., `project/src/components/Settings.tsx`)
+  - Use the hook in the Settings component, change values, refresh the page, and confirm values persist in `localStorage`.
+  - Expected: values persist across reloads; hook handles SSR safely (no server errors).
 
 ## Verification Checklist
 
