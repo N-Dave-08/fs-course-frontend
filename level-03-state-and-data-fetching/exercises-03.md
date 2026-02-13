@@ -596,26 +596,208 @@ Complete these files to pass verification:
 
 ## Advanced Exercises
 
-1. Rewrite a multi-input form to use `useReducer` and add tests that assert reducer transitions and edge cases.
+These exercises deepen your understanding of React state management and testing patterns. Build on the fundamentals from Exercises 1-5.
 
-  - Objective: practice reducer-based state and unit testing reducers.
-  - Instructions: convert a multi-field form into a component using `useReducer` with explicit action types; add unit tests for reducer logic (inputs, reset, submit error path).
-  - Expected Code/File: `project/src/components/FormWithReducer.tsx`, reducer in `project/src/components/formReducer.ts` and tests in `project/src/components/__tests__/formReducer.test.ts`.
-  - Verification: reducer tests pass and component behaves correctly when interacting with inputs.
+---
 
-2. Build a `useDebouncedValue` custom hook and use it to debounce a search input component; include tests for timing behavior.
+### 🎯 Exercise A.1: Form State with `useReducer` + Testing
 
-  - Objective: implement a reusable hook for debouncing values and test timings.
-  - Instructions: create `project/src/hooks/useDebouncedValue.ts` (accepts `value` and `delay` ms); use in `project/src/components/SearchWithDebounce.tsx`. Add tests using fake timers to assert debounce behavior.
-  - Expected Code/File: `project/src/hooks/useDebouncedValue.ts`, `project/src/components/SearchWithDebounce.tsx`, tests under `project/src/hooks/__tests__/useDebouncedValue.test.ts`.
-  - Verification: tests assert value updates only after delay and cleanup on unmount.
+**Objective:** Master complex form state management and unit test reducer logic.
 
-3. Add `zustand` to the project and migrate a small piece of shared state (theme toggle or simple counter); show how to replace the Context pattern with a small `zustand` store and update components.
+**Difficulty:** 🟡 Intermediate | **Time:** 2-3 hours
 
-  - Objective: demonstrate a minimal global state migration with `zustand` and explain tradeoffs versus Context/Redux.
-  - Instructions: create `project/src/store/useAppStore.ts` with a simple store (`count`, `inc`, `toggleTheme`), update components to use the store, and add a short README note describing the migration.
-  - Expected Code/File: `project/src/store/useAppStore.ts`, updated components (e.g., `project/src/components/ThemeToggle.tsx`), and a small `project/docs/zustand-migration.md`.
-  - Verification: components read and update state via `useAppStore` and no Context provider is required.
+#### Tasks
+
+1. **Create reducer hook**
+   - File: `project/src/components/formReducer.ts`
+   - Implement explicit action types (CHANGE_FIELD, RESET, SET_ERROR, SUBMIT)
+   - Handle form state transitions (initial → editing → submitted)
+
+2. **Build form component**
+   - File: `project/src/components/FormWithReducer.tsx`
+   - Use `useReducer` to manage multi-field form state
+   - Support fields: name, email, password
+   - Validate on submit, show errors inline
+
+3. **Write reducer tests**
+   - File: `project/src/components/__tests__/formReducer.test.ts`
+   - Test each action type
+   - Test error states and edge cases
+   - Test field updates and reset
+
+#### Expected Behavior
+
+| Scenario | Expected | Implementation |
+|----------|----------|-----------------|
+| Type in field | State updates | Dispatch CHANGE_FIELD action |
+| Submit form | Validates fields | Reducer validates in SUBMIT action |
+| Reset button | Clear all fields | Dispatch RESET action clears state |
+| Invalid email | Show error | Reducer catches validation error |
+
+#### Verification
+- [ ] Reducer tests pass (all action types covered)
+- [ ] Form component renders and updates correctly
+- [ ] Error messages appear on validation failure
+- [ ] Reset button clears form completely
+
+#### Hints
+- Use TypeScript discriminated unions for action types
+- Test reducer in isolation (pure function testing)
+- Keep reducer logic separate from component logic
+
+---
+
+### ⚡ Exercise A.2: Debounced Search Hook + Testing
+
+**Objective:** Create reusable hooks and test async/timer behavior.
+
+**Difficulty:** 🟡 Intermediate | **Time:** 2 hours
+
+#### Tasks
+
+1. **Create debounce hook**
+   - File: `project/src/hooks/useDebouncedValue.ts`
+   - Parameter: `value` (T), `delay` (ms)
+   - Returns: debounced value
+   - Cleanup on unmount
+
+2. **Build search component**
+   - File: `project/src/components/SearchWithDebounce.tsx`
+   - Use debounced hook for search input
+   - Show results only after debounce delay
+   - Display loading state while searching
+
+3. **Write integration tests**
+   - File: `project/src/hooks/__tests__/useDebouncedValue.test.ts`
+   - Use fake timers (jest.useFakeTimers)
+   - Test debounce delay timing
+   - Test cleanup on unmount
+   - Test rapid input changes
+
+#### Expected Behavior
+
+```
+User types: "a" → "ab" → "abc" → [waits 500ms] → api call with "abc"
+(Not separate calls for "a", "ab", "abc")
+```
+
+#### Verification
+- [ ] Hook delays value updates by specified ms
+- [ ] Cleanup runs on unmount
+- [ ] Multiple rapid changes only trigger one final update
+- [ ] Tests use fake timers (jest.useFakeTimers)
+
+#### Hints
+- Use `useEffect` with timeout cleanup
+- Test with `jest.useFakeTimers()` and `jest.runAllTimers()`
+- Remember to call `jest.useRealTimers()` after test
+
+---
+
+### 🏪 Exercise A.3: Global State with `zustand`
+
+**Objective:** Learn lightweight state management alternative to Context API.
+
+**Difficulty:** 🟡 Intermediate | **Time:** 1.5-2 hours
+
+#### Tasks
+
+1. **Create zustand store**
+   - File: `project/src/store/useAppStore.ts`
+   - State: `count` (number), `theme` (string)
+   - Actions: `inc()`, `dec()`, `toggleTheme()`
+
+2. **Update components**
+   - File: `project/src/components/ThemeToggle.tsx`
+   - Use `useAppStore()` for theme state
+   - Remove Context provider dependency
+
+3. **Add migration guide**
+   - File: `project/docs/zustand-migration.md`
+   - Explain Context vs `zustand` tradeoffs
+   - Show before/after code examples
+   - When to use each approach
+
+#### Store Implementation Checklist
+
+```typescript
+// Rough structure:
+import { create } from 'zustand';
+
+type AppStore = {
+  count: number;
+  theme: 'light' | 'dark';
+  inc: () => void;
+  toggleTheme: () => void;
+};
+
+export const useAppStore = create<AppStore>((set) => ({
+  // initial state
+  // actions
+}));
+```
+
+#### Verification
+- [ ] `useAppStore()` works in components (no provider needed)
+- [ ] State updates trigger re-renders
+- [ ] ThemeToggle component reads/updates `theme`
+- [ ] Migration guide explains Context vs zustand
+- [ ] Components don't require `QueryClientProvider` style wrapping
+
+#### Hints
+- No provider needed—zustand handles state globally
+- Selectors prevent unnecessary re-renders: `useAppStore(s => s.count)`
+- Smaller bundles than Redux/Context for simple state
+
+#### Tradeoffs Table
+
+| Aspect | Context API | Zustand |
+|--------|-------------|---------|
+| **Boilerplate** | 🔴 High | 🟢 Low |
+| **Bundle Size** | 🟢 Built-in | 🟡 ~1KB |
+| **Learning Curve** | 🟡 Medium | 🟢 Easy |
+| **Best For** | Theme/Auth | Any state |
+| **Devtools** | Basic | 🟢 Great |
+
+---
+
+## Advanced Exercises Summary
+
+| Exercise | Focus | Difficulty | Est. Time |
+|----------|-------|-----------|-----------|
+| **A.1** | `useReducer` + Testing | 🟡 Intermediate | 2-3h |
+| **A.2** | Custom Hooks + Async Tests | 🟡 Intermediate | 2h |
+| **A.3** | Global State Management | 🟡 Intermediate | 1.5-2h |
+
+**Total Time:** ~5.5-7 hours for all advanced exercises
+
+---
+
+### 📋 All Required Files
+
+#### Exercise A.1
+- ✅ `project/src/components/FormWithReducer.tsx`
+- ✅ `project/src/components/formReducer.ts`
+- ✅ `project/src/components/__tests__/formReducer.test.ts`
+
+#### Exercise A.2
+- ✅ `project/src/hooks/useDebouncedValue.ts`
+- ✅ `project/src/components/SearchWithDebounce.tsx`
+- ✅ `project/src/hooks/__tests__/useDebouncedValue.test.ts`
+
+#### Exercise A.3
+- ✅ `project/src/store/useAppStore.ts`
+- ✅ `project/src/components/ThemeToggle.tsx` (updated)
+- ✅ `project/docs/zustand-migration.md`
+
+---
+
+### 🚀 Next Steps After Advanced Exercises
+
+1. **Combine patterns:** Try using `useReducer` + `zustand` together
+2. **Test more:** Add React Testing Library tests alongside your unit tests
+3. **Optimize:** Use React DevTools Profiler to measure performance
+4. **Explore:** Look at how established projects use these patterns
 
 
 ## Running Exercises
