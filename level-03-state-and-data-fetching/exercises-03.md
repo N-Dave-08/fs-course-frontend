@@ -437,24 +437,69 @@ export default function Settings() {
 ---
 
 ## Exercise 5: Data fetching libraries (axios / React Query)
+
 **Objective:** Practice using a dedicated HTTP client and a client caching library; learn how to integrate them into a Next.js app and common pitfalls.
 
-**Instructions:**
-- Task A — Axios & interceptor:
-  - Create an `axios` instance at `project/src/lib/api.ts` with a sensible `baseURL` (use `NEXT_PUBLIC_API_URL`) and a request interceptor that attaches `Authorization: Bearer <token>` when a token exists (from `localStorage` or a token hook).
-  - Replace the client `fetch` in `project/src/components/DataFetcher.tsx` with an axios-based component `project/src/components/DataFetcherAxios.tsx` that uses the axios instance.
+---
 
-- Task B — React Query (TanStack Query):
-  - Add `@tanstack/react-query` and provide a `QueryClient` in your app root (`project/src/app/layout.tsx` or `project/src/pages/_app.tsx`).
-  - Implement `project/src/components/PostsListRQ.tsx` that uses `useQuery(['posts'], fetchPosts)` where `fetchPosts` calls the axios instance (`api.get('/posts').then(r => r.data)`).
-  - Implement `project/src/components/CreatePostForm.tsx` that uses `useMutation` to post data and performs optimistic updates / invalidates the `posts` query on success.
+### 📋 Tasks & Implementation
 
-- Task C — Pagination (optional advanced):
-  - Implement cursor-based pagination using React Query's `useInfiniteQuery` (`getNextPageParam` / `fetchNextPage`) or implement a manual `Load more` button that calls `/api/posts?page=2` and appends results in the UI.
+#### **Task A: Axios & Request Interceptor** ✅ (Required)
+
+Set up a centralized axios instance with automatic authentication header injection:
+
+1. **Create axios instance** at `project/src/lib/api.ts`
+   - Configure sensible `baseURL` from `process.env.NEXT_PUBLIC_API_URL`
+   - Add request interceptor to attach `Authorization: Bearer <token>`
+   - Token sourced from `localStorage` when available
+
+2. **Create axios-based component** at `project/src/components/DataFetcherAxios.tsx`
+   - Replace fetch-based logic from Exercise 2
+   - Use the axios instance for all requests
+   - Maintain loading/error/success state handling
+
+---
+
+#### **Task B: React Query (TanStack Query) Integration** ✅ (Required)
+
+Implement powerful client-side caching and synchronization:
+
+1. **Install & setup React Query**
+   - Add `@tanstack/react-query` to dependencies
+   - Wrap app in `QueryClientProvider` at `project/src/app/layout.tsx`
+
+2. **Create query component** at `project/src/components/PostsListRQ.tsx`
+   - Use `useQuery(['posts'], fetchPosts)` hook
+   - Call axios instance: `api.get('/posts').then(r => r.data)`
+   - Handle loading, error, and success states
+
+3. **Create mutation component** at `project/src/components/CreatePostForm.tsx`
+   - Use `useMutation` to post new data
+   - Implement optimistic updates
+   - Invalidate posts query on success
+
+---
+
+#### **Task C: Pagination** 🚀 (Optional Advanced)
+
+Choose one approach for handling paginated data:
+
+| Approach | Use Case | Complexity |
+|----------|----------|-----------|
+| **Infinite Query** (`useInfiniteQuery`) | Infinite scroll, continuous loading | Medium |
+| **Manual "Load More"** | Explicit user control | Low |
+
+Implementation options:
+- Use `getNextPageParam` and `fetchNextPage` from React Query
+- OR manually call `/api/posts?page=2`, append results to existing data
+
+---
+
+### 📝 Expected Code Structure
 
 **Expected Code Structure (snippets):**
 
-`project/src/lib/api.ts`
+##### `project/src/lib/api.ts`
 ```typescript
 import axios from 'axios';
 
@@ -469,7 +514,7 @@ api.interceptors.request.use((config) => {
 export default api;
 ```
 
-`project/src/app/layout.tsx` (provider)
+##### `project/src/app/layout.tsx` (QueryClient Provider)
 ```tsx
 "use client";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -480,7 +525,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-`project/src/components/PostsListRQ.tsx`
+##### `project/src/components/PostsListRQ.tsx`
 ```tsx
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
@@ -495,20 +540,57 @@ export function PostsList() {
 }
 ```
 
-**Verification Steps:**
-1. Axios: the axios-based component loads data and behaves like the fetch-based version; the axios instance adds the `Authorization` header when a token exists.
-2. React Query: `PostsList` uses `useQuery` and shows loading/error states correctly; creating a post via `useMutation` performs optimistic update and then syncs with the server.
-3. Pagination: `Load more` or infinite query loads more pages and appends results; handles end-of-list and errors.
+---
 
-**Hints:**
-- Use axios interceptors for auth header injection and centralized error transforms.
-- Keep React Query usage inside client components; use server components for initial render when appropriate.
+### ✅ Verification Checklist
 
-**Common Mistakes:**
-- Forgetting to wrap app in `QueryClientProvider` (queries do nothing).
-- Storing secrets in `NEXT_PUBLIC_*` — avoid putting private keys in public env vars.
+- [ ] **Axios Setup**: Component loads data correctly; Authorization header present when token exists
+- [ ] **React Query**: `PostsList` uses `useQuery`, shows loading/error/success states
+- [ ] **Mutations**: `CreatePostForm` successfully posts data with optimistic updates
+- [ ] **Query Invalidation**: Posts list refreshes after creating new post
+- [ ] **(Optional) Pagination**: Load more button or infinite scroll works; handles end-of-list
 
-**Files:** `project/src/lib/api.ts`, `project/src/components/DataFetcherAxios.tsx`, `project/src/components/PostsListRQ.tsx`, `project/src/components/CreatePostForm.tsx`
+**Testing Tips:**
+1. Open DevTools → Network tab to verify Authorization headers
+2. Add token to localStorage, verify header is sent
+3. Test error states with invalid URLs
+4. Create a post and confirm list updates immediately (optimistic) then again after server confirms
+
+---
+
+### 💡 Hints & Best Practices
+
+| Aspect | Recommendation |
+|--------|-----------------|
+| **Auth Headers** | Use interceptors for centralized token injection |
+| **Client vs Server** | Keep React Query in client components; use Server Components for initial render |
+| **Caching** | Let React Query handle cache invalidation—don't manually refetch |
+| **Error Handling** | Provide user-friendly error messages, not raw API responses |
+| **Secrets** | Never use `NEXT_PUBLIC_*` for private keys or auth tokens |
+
+---
+
+### ⚠️ Common Mistakes
+
+| Mistake | Impact | Solution |
+|---------|--------|----------|
+| **Missing `QueryClientProvider`** | Queries silently fail; no data loads | Wrap app root in provider |
+| **Storing tokens in `NEXT_PUBLIC_*`** | Security vulnerability | Use environment variables or secure storage |
+| **Not invalidating cache** | Stale data displayed after mutations | Call `queryClient.invalidateQueries({queryKey: ['posts']})` |
+| **Forgetting to type response data** | `any` types everywhere; type errors missed | Define `interface Post {}` and use generics: `useQuery<Post[]>` |
+| **Updating axios instance after init** | Interceptors not applied | Create instance once and export; reuse everywhere |
+
+---
+
+### 📦 Required Files
+
+Complete these files to pass verification:
+
+- ✅ `project/src/lib/api.ts` — Axios instance with interceptor
+- ✅ `project/src/components/DataFetcherAxios.tsx` — Axios-based data fetcher
+- ✅ `project/src/components/PostsListRQ.tsx` — React Query with `useQuery`
+- ✅ `project/src/components/CreatePostForm.tsx` — React Query with `useMutation`
+- ⭐ **(Optional)** `project/src/components/PaginationComponent.tsx` — Infinite query or manual load more
 
 ---
 
