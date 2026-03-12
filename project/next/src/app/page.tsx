@@ -1,6 +1,8 @@
+import Counter from "@/components/counter";
+import ServerInfo from "@/components/server-info";
+import CardGrid from "@/components/ui/card-grid";
+import { cards } from "@/helpers/cards";
 import Link from "next/link";
-import ServerInfo from "./components/server-info";
-import Counter from "./components/counter";
 
 export default function Home() {
 	return (
@@ -21,6 +23,7 @@ export default function Home() {
 					</Link>
 					<ServerInfo />
 					<Counter />
+					<CardGrid cards={cards} />
 				</div>
 			</div>
 		</div>
