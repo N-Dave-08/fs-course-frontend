@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "./ui/button";
 
 export default function Counter() {
 	const [count, setCount] = useState(0);
+
+	useEffect(() => {
+		console.log("component mounts, count", count);
+		console.log("component rerendered");
+	}, [count]);
 
 	return (
 		<div className="bg-green-50 border border-green-200 rounded-lg p-6 my-4">
@@ -12,18 +17,17 @@ export default function Counter() {
 				Client Component - Counter
 			</h2>
 			<div className=" flex items-center gap-4">
-				<Button
-					variant="primary"
-					label="Increment"
-					onClick={() => setCount(count + 1)}
-				/>
+				<Button variant="primary" onClick={() => setCount(count + 1)}>
+					Increment
+				</Button>
 				<span className="text-2xl font-bold text-green-900"> {count}</span>
 				<Button
 					variant="danger"
-					label="Decrement"
 					onClick={() => setCount(count - 1)}
 					disabled={count === 0}
-				/>
+				>
+					Decrement
+				</Button>
 			</div>
 		</div>
 	);

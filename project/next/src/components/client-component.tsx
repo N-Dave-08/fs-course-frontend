@@ -10,12 +10,10 @@ export default function ClientComponent() {
 		<div>
 			<p>Count: {count}</p>
 
-			<Button label="increment" onClick={() => setCount((c) => c + 1)} />
-			<Button
-				label="decrement"
-				onClick={() => setCount((c) => c - 1)}
-				disabled={count === 0}
-			/>
+			<Button onClick={() => setCount((c) => c + 1)}>Increment</Button>
+			<Button onClick={() => setCount((c) => c - 1)} disabled={count === 0}>
+				Decrement
+			</Button>
 		</div>
 	);
 }

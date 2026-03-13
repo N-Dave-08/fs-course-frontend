@@ -1,6 +1,15 @@
+"use client";
+
 import Image from "next/image";
+import UseEffect from "@/components/use-effect";
+import { useState } from "react";
+import { UseMemoExample } from "@/components/use-memo-example";
+import Button from "@/components/ui/button";
 
 export default function Playground() {
+	const fixedItems = [2, 3, 6];
+	const [counter, setCounter] = useState(0);
+
 	return (
 		<main className="grow">
 			<div className="min-h-screen bg-gray-50  items-center justify-center">
@@ -58,6 +67,15 @@ export default function Playground() {
 						<div className="bg-orange-200  w-64 shrink-0">Box</div>
 						<div className="bg-purple-200  w-64">Box</div>
 					</div>
+
+					<UseEffect />
+
+					<UseMemoExample items={fixedItems} />
+					<button type="button" onClick={() => setCounter((c) => c + 1)}>
+						Re-render parent {counter}
+					</button>
+
+					<Button variant="glass">Glass</Button>
 				</div>
 			</div>
 		</main>

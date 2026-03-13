@@ -2,14 +2,16 @@ import { cx } from "@/lib/utils";
 
 interface ButtonProps {
 	className?: string;
-	label: string;
-	onClick: () => void;
-	variant?: "primary" | "secondary" | "danger";
+	children: React.ReactNode;
+	onClick?: () => void;
+	variant?: "primary" | "secondary" | "danger" | "glass";
 	disabled?: boolean;
+	ref?: React.Ref<HTMLButtonElement>;
 }
 
-const buttonClass = (variant: "primary" | "secondary" | "danger") =>
+const buttonClass = (variant: "primary" | "secondary" | "danger" | "glass") =>
 	cx(
+		"h-10 min-w-20",
 		"py-1 px-2 rounded-lg focuse:outline-none focus:ring-2",
 		"disabled:text-gray-500 transition",
 
@@ -23,10 +25,11 @@ const buttonClass = (variant: "primary" | "secondary" | "danger") =>
 
 export default function Button({
 	className,
-	label,
+	children,
 	onClick,
 	variant = "primary",
 	disabled,
+	ref,
 }: ButtonProps) {
 	return (
 		<button
@@ -34,8 +37,9 @@ export default function Button({
 			type="button"
 			onClick={onClick}
 			disabled={disabled}
+			ref={ref}
 		>
-			{label}
+			{children}
 		</button>
 	);
 }

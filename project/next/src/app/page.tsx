@@ -1,4 +1,6 @@
 import Counter from "@/components/counter";
+import DataFetcher from "@/components/data-fetcher";
+import NameForm from "@/components/name-form";
 import ServerInfo from "@/components/server-info";
 import CardGrid from "@/components/ui/card-grid";
 import { cards } from "@/helpers/cards";
@@ -24,6 +26,8 @@ export default function Home() {
 					<ServerInfo />
 					<Counter />
 					<CardGrid cards={cards} />
+					<NameForm />
+					<DataFetcher />
 				</div>
 			</div>
 		</div>

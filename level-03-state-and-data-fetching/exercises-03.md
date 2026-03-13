@@ -831,14 +831,14 @@ pnpm dev
 
 After completing all exercises, verify:
 
-- [ ] useState manages state correctly
-- [ ] useEffect fetches data on mount
-- [ ] Loading states work
-- [ ] Error states work
-- [ ] Server Component fetches work
-- [ ] Custom hook works and is reusable
-- [ ] localStorage persistence works
-- [ ] All components are type-safe
+- [X] useState manages state correctly
+- [X] useEffect fetches data on mount
+- [X] Loading states work
+- [X] Error states work
+- [X] Server Component fetches work
+- [X] Custom hook works and is reusable
+- [X] localStorage persistence works
+- [X] All components are type-safe
 
 ## Troubleshooting
 
