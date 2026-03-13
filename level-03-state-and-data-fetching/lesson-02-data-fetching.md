@@ -32,10 +32,10 @@ In Next.js App Router, you can fetch data on the server by default, which often 
 
 ```mermaid
 flowchart LR
-  request[Request] --> server[ServerComponent]
-  server -->|fetch| data[DataSource]
-  server --> html[HTMLStream]
-  html --> browser[Browser]
+    request[Request] --> server[ServerComponent]
+    server -->|fetch| data[DataSource]
+    server --> html[HTMLStream]
+    html --> browser[Browser]
 ```
 
 ## Server Components (Recommended Default)
