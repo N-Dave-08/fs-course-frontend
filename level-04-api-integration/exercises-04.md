@@ -322,14 +322,14 @@ pnpm dev
 
 After completing all exercises, verify:
 
-- [ ] API client works correctly
-- [ ] GET requests work
-- [ ] POST requests work
-- [ ] Error handling works
-- [ ] Loading states work
-- [ ] Success states work
-- [ ] Frontend connects to backend
-- [ ] All code is type-safe
+- [X] API client works correctly
+- [X] GET requests work
+- [X] POST requests work
+- [X] Error handling works
+- [X] Loading states work
+- [X] Success states work
+- [X] Frontend connects to backenX
+- [X] All code is type-safe
 
 ## Troubleshooting
 

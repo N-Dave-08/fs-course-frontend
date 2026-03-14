@@ -1,8 +1,12 @@
 import Counter from "@/components/counter";
+import CreatePostForm from "@/components/create-post-form";
+import CreateUserForm from "@/components/create-user-form";
 import DataFetcher from "@/components/data-fetcher";
 import NameForm from "@/components/name-form";
+import PostsList from "@/components/posts-list";
 import ServerInfo from "@/components/server-info";
 import CardGrid from "@/components/ui/card-grid";
+import UpdateUserForm from "@/components/update-user-form";
 import { cards } from "@/helpers/cards";
 import Link from "next/link";
 
@@ -28,6 +32,10 @@ export default function Home() {
 					<CardGrid cards={cards} />
 					<NameForm />
 					<DataFetcher />
+					<CreateUserForm />
+					<UpdateUserForm userId="132" />
+					<CreatePostForm />
+					<PostsList />
 				</div>
 			</div>
 		</div>

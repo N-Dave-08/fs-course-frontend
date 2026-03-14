@@ -5,6 +5,8 @@ import UseEffect from "@/components/use-effect";
 import { useState } from "react";
 import { UseMemoExample } from "@/components/use-memo-example";
 import Button from "@/components/ui/button";
+import CreatePostForm from "@/components/create-post-form";
+import PostsList from "@/components/posts-list";
 
 export default function Playground() {
 	const fixedItems = [2, 3, 6];
@@ -27,34 +29,28 @@ export default function Playground() {
 							</p>
 						</div>
 					</div>
-
 					{/* Grid */}
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 						<div className="bg-purple-200">Item 1</div>
 						<div className="bg-purple-200">Item 2</div>
 						<div className="bg-purple-200">Item 3</div>
 					</div>
-
 					{/* Max Width */}
 					<div className="container max-w-xl mx-auto px-4 bg-green-200">
 						Content with max width
 					</div>
-
 					{/* Responsive Classes */}
 					<div className="text-sm md:test-base lg:text-lg">Responsive text</div>
-
 					{/* Mobile responsive first */}
 					<div className="flex flex-col gap-4 md:flex-row bg-amber-200">
 						<div className="p-4 bg-indigo-200">left</div>
 						<div className="p-4 bg-indigo-200">right</div>
 					</div>
-
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 						<div className="bg-green-200">Box</div>
 						<div className="bg-green-200">Box</div>
 						<div className="bg-green-200">Box</div>
 					</div>
-
 					<Image
 						src={"/image.jpg"}
 						alt="the thing"
@@ -62,20 +58,18 @@ export default function Playground() {
 						height={500}
 						className="w-full h-auto"
 					/>
-
 					<div className="flex w-96">
 						<div className="bg-orange-200  w-64 shrink-0">Box</div>
 						<div className="bg-purple-200  w-64">Box</div>
 					</div>
-
 					<UseEffect />
-
 					<UseMemoExample items={fixedItems} />
 					<button type="button" onClick={() => setCounter((c) => c + 1)}>
 						Re-render parent {counter}
 					</button>
-
 					<Button variant="glass">Glass</Button>
+					<CreatePostForm />
+					<PostsList />
 				</div>
 			</div>
 		</main>

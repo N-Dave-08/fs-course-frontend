@@ -1,5 +1,3 @@
-import React from "react";
-
 interface Post {
 	id: number;
 	title: string;
