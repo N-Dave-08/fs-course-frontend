@@ -450,14 +450,14 @@ pnpm dev
 
 After completing all exercises, verify:
 
-- [ ] Login form works
-- [ ] Token stored correctly
-- [ ] Protected routes work
-- [ ] Redirects work
-- [ ] Auth context works
-- [ ] State persists
-- [ ] Logout works
-- [ ] All code is type-safe
+- [X] Login form works
+- [X] Token stored correctly
+- [X] Protected routes work
+- [X] Redirects work
+- [X] Auth context works
+- [X] State persists
+- [X] Logout works
+- [X] All code is type-safe
 
 ## Troubleshooting
 

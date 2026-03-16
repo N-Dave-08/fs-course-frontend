@@ -1,6 +1,9 @@
-import { apiClient } from "@/lib/api-client";
+import LogoutButton from "@/components/logout-button";
 import UsersList from "../_components/users-list";
-
+import UpdateUserFormWrapper from "@/components/update-user-form-wrapper";
+import { getUsers } from "@/services/user-service";
+import { cookies } from "next/headers";
+import Navbar from "../_components/navbar";
 interface User {
 	id: number;
 	name: string;
@@ -9,20 +12,14 @@ interface User {
 	bio: string;
 }
 
-async function getUsers(): Promise<User[]> {
-	const data = await apiClient<{ data: User[] }>("/users", {
-		cache: "no-store",
-	});
-
-	return data.data;
-}
-
 export default async function UsersPage() {
 	let users: User[] = [];
 	let error: string | null = null;
 
 	try {
-		users = await getUsers();
+		const cookieStore = await cookies();
+		const token = cookieStore.get("token")?.value;
+		users = await getUsers(token);
 	} catch (err) {
 		error = err instanceof Error ? err.message : "Failed to fetch users";
 	}
@@ -33,7 +30,10 @@ export default async function UsersPage() {
 
 	return (
 		<div className="min-h-screen bg-gray-50 py-12 px-4">
+			<Navbar />
 			<UsersList initialUsers={users} />
+			<UpdateUserFormWrapper />
+			<LogoutButton />
 		</div>
 	);
 }

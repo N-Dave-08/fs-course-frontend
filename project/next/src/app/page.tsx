@@ -2,6 +2,7 @@ import Counter from "@/components/counter";
 import CreatePostForm from "@/components/create-post-form";
 import CreateUserForm from "@/components/create-user-form";
 import DataFetcher from "@/components/data-fetcher";
+import LoginForm from "@/components/login-form";
 import NameForm from "@/components/name-form";
 import PostsList from "@/components/posts-list";
 import ServerInfo from "@/components/server-info";
@@ -36,6 +37,7 @@ export default function Home() {
 					<UpdateUserForm userId="132" />
 					<CreatePostForm />
 					<PostsList />
+					<LoginForm />
 				</div>
 			</div>
 		</div>

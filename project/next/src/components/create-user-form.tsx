@@ -1,6 +1,6 @@
 "use client";
 
-import { createUser, CreateUserInput } from "@/services/user-service";
+import { type CreateUserInput, register } from "@/services/auth-service";
 import { useState } from "react";
 
 export default function CreateUserForm() {
@@ -34,7 +34,7 @@ export default function CreateUserForm() {
 		try {
 			// call the user-service createUser function
 			// it uses apiClient internally to make the HTTP POST request
-			await createUser(form);
+			await register(form);
 
 			// reset form state after successful submission
 			setForm({ email: "", name: "", age: 0, bio: "", password: "" });

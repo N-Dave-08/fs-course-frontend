@@ -3,47 +3,50 @@ const API_URL = "http://localhost:3001/api";
 export type ApiError = {
 	status: number;
 	message: string;
-	details?: unknown; // optional extra error info returned by the API
+	details?: unknown;
 };
 
 export async function apiClient<T>(
 	endpoint: string,
-	options?: RequestInit, // built-in type for fetch configuration (method, headers, body, etc.)
+	options?: RequestInit,
+	token?: string,
 ): Promise<T> {
+	// 1. Build headers dynamically
+	const headers = new Headers(options?.headers);
+	headers.set("Content-Type", "application/json");
+
+	// 2. Only add Authorization if token exists (Server Component usage)
+	if (token) {
+		headers.set("Authorization", `Bearer ${token}`);
+	}
+
 	const res = await fetch(`${API_URL}${endpoint}`, {
-		headers: {
-			"Content-Type": "application/json",
-
-			// merges any headers passed from the caller
-			// if options.headers exists → spread them
-			// if not → use empty object to avoid errors
-			...(options?.headers ?? {}),
-		},
-
-		// spreads the rest of the fetch options
-		// example: method, body, credentials, etc.
 		...options,
+		headers,
+		// 3. 'include' is safe for both server and client in modern Fetch,
+		// but explicit check is fine.
+		credentials: "include",
 	});
 
-	// If HTTP status is NOT in the 200–299 range
 	if (!res.ok) {
-		const text = await res.text(); // ← only one body read, always safe
-
+		const text = await res.text();
 		let details: unknown;
 		try {
 			details = text ? JSON.parse(text) : null;
 		} catch {
-			details = text; // ← keep raw text if not valid JSON
+			details = text;
 		}
 
+		// Throw a structured error that your UI can catch
 		throw {
 			status: res.status,
-			message: res.statusText,
+			message: (details as any)?.error || res.statusText,
 			details,
-		} satisfies ApiError;
+		} as ApiError;
 	}
 
-	// parse successful response JSON
-	// <T> ensures TypeScript knows the expected return type
+	// Handle empty responses (like 204 No Content) gracefully
+	if (res.status === 204) return {} as T;
+
 	return res.json();
 }
