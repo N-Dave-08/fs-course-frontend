@@ -5,11 +5,15 @@ import DataFetcher from "@/components/data-fetcher";
 import LoginForm from "@/components/login-form";
 import NameForm from "@/components/name-form";
 import PostsList from "@/components/posts-list";
+import SearchTrigger from "@/components/search-trigger";
 import ServerInfo from "@/components/server-info";
+import SlowComponent from "@/components/slow-component";
+import Button from "@/components/ui/button";
 import CardGrid from "@/components/ui/card-grid";
 import UpdateUserForm from "@/components/update-user-form";
 import { cards } from "@/helpers/cards";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default function Home() {
 	return (
@@ -38,6 +42,12 @@ export default function Home() {
 					<CreatePostForm />
 					<PostsList />
 					<LoginForm />
+					<SearchTrigger />
+
+					<Suspense fallback={<p>loading data</p>}>
+						<SlowComponent />
+					</Suspense>
+					<Button>click me</Button>
 				</div>
 			</div>
 		</div>

@@ -228,12 +228,12 @@ pnpm dev
 
 ## Verification Checklist
 
-- [ ] Images optimized
-- [ ] Code splitting works
-- [ ] Performance monitored
-- [ ] At least one test written (RTL or Playwright)
-- [ ] Bundle size reduced
-- [ ] Core Web Vitals improved
+- [X] Images optimized
+- [X] Code splitting works
+- [X] Performance monitored
+- [X] At least one test written (RTL or Playwright)
+- [X] Bundle size reduced
+- [X] Core Web Vitals improved
 
 ## Next Steps
 

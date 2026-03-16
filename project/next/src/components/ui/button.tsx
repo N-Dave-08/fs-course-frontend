@@ -12,7 +12,7 @@ interface ButtonProps {
 const buttonClass = (variant: "primary" | "secondary" | "danger" | "glass") =>
 	cx(
 		"h-10 min-w-20",
-		"py-1 px-2 rounded-lg focuse:outline-none focus:ring-2",
+		"py-1 px-2 rounded-lg focus:outline-none focus:ring-2",
 		"disabled:text-gray-500 transition",
 
 		variant === "primary" &&

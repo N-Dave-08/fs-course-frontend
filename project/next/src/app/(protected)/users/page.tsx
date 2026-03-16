@@ -4,6 +4,7 @@ import UpdateUserFormWrapper from "@/components/update-user-form-wrapper";
 import { getUsers } from "@/services/user-service";
 import { cookies } from "next/headers";
 import Navbar from "../_components/navbar";
+import Button from "@/components/ui/button";
 interface User {
 	id: number;
 	name: string;
@@ -34,6 +35,7 @@ export default async function UsersPage() {
 			<UsersList initialUsers={users} />
 			<UpdateUserFormWrapper />
 			<LogoutButton />
+			<Button>click me</Button>
 		</div>
 	);
 }
